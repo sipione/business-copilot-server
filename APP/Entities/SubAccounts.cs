@@ -12,7 +12,7 @@ public class SubAccounts
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public List<Progress> Progresses { get; set; }
-    public List<Permitions> Permitions { get; set; }
+    public List<Permitions> PermitionsList { get; set; }
 
     public SubAccounts(User user, Stakeholder stakeholder, string? description, string password, SubAccountRole role)
     {
@@ -26,10 +26,24 @@ public class SubAccounts
         CreatedAt = DateTime.Now;
         UpdatedAt = DateTime.Now;
         Progresses = new List<Progress>();
-        Permitions = new List<Permitions>();
+        PermitionsList = new List<Permitions>();
     }
 
-    public string toString()
+    public void AllowPermitionsByRole()
+    {
+        List<Permitions> allPermitions = Permitions.GetValues(typeof(Permitions)).Cast<Permitions>().ToList();
+
+        if(SubAccountRole.EDITOR == this.Role)
+        {
+            this.PermitionsList = allPermitions.Where(p => !p.ToString().Contains("USERS") || !p.ToString().Contains("DELETE") || !p.ToString().Contains("CREATE")).ToList();
+        }
+        else if(SubAccountRole.VIWER == this.Role)
+        {
+            this.PermitionsList = allPermitions.Where(p => !p.ToString().Contains("USERS") && p.ToString().Contains("READ")).ToList();
+        }
+    }
+
+    public override string ToString()
     {
         return $"Id: {Id}, Name: {Name}, Email: {Email}, Role: {Role}, Status: {Status}, CreatedAt: {CreatedAt}, UpdatedAt: {UpdatedAt}";
     }

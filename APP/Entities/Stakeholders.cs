@@ -40,7 +40,7 @@ public class Stakeholder{
         Contracts = new List<Contract>();
     }
 
-    public string toString()
+    public override string ToString()
     {
         return $"Id: {Id}, Name: {Name}, Email: {Email}, Type: {Type}, Status: {Status}, CreatedAt: {CreatedAt}, UpdatedAt: {UpdatedAt}";
     }

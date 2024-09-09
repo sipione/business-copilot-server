@@ -21,7 +21,7 @@ public class Progress
         FilesPaths = new List<string>();
     }
 
-    public string toString()
+    public override string ToString()
     {
         return $"Id: {Id}, Title: {Title}, Description: {Description}, CreatedAt: {CreatedAt}, UpdatedAt: {UpdatedAt}";
     }

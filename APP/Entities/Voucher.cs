@@ -27,4 +27,21 @@ public class Voucher
         UpdatedAt = DateTime.Now;
         Contracts = new List<Contract>();
     }
+
+    public void UseVoucher()
+    {
+        if (UsageCount < UsageLimit)
+        {
+            UsageCount++;
+        }
+        else
+        {
+            Status = AccountStatus.CANCELED;
+        }
+    }
+
+    public override string ToString()
+    {
+        return $"Id: {Id}, Code: {Code}, Value: {Value}, ExpirationDate: {ExpirationDate}, UsageLimit: {UsageLimit}, UsageCount: {UsageCount}, Status: {Status}, CreatedAt: {CreatedAt}, UpdatedAt: {UpdatedAt}";
+    }
 }

@@ -47,7 +47,7 @@ public class Contract
         UpdatedAt = DateTime.Now;
     }
 
-    public string toString()
+    public override string ToString()
     {
         return $"Id: {Id}, Title: {Title}, InitialAmount: {InitialAmount}, Discount: {Discount}, Installments: {Installments}, Interest: {Interest}, Penalty: {Penalty}, TotalAmount: {TotalAmount}, PaidAmount: {PaidAmount}, RemainingAmount: {RemainingAmount}, PaymentStatus: {PaymentStatus}, ContractStatus: {ContractStatus}, StartDate: {StartDate}, EndDate: {EndDate}, CreatedAt: {CreatedAt}, UpdatedAt: {UpdatedAt}";
     }

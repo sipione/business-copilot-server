@@ -23,7 +23,7 @@ public class CashFlow
         UpdatedAt = DateTime.Now;
     }
 
-    public string toString()
+    public override string ToString()
     {
         return $"Id: {Id}, Description: {Description}, Amount: {Amount}, TransactionDate: {TransactionDate}, Status: {Status}, CreatedAt: {CreatedAt}, UpdatedAt: {UpdatedAt}";
     }
@@ -37,6 +37,11 @@ public class IncomeCashFlow : CashFlow
     {
         Category = category;
     }
+
+    public override string ToString()
+    {
+        return $"Id: {Id}, Description: {Description}, Amount: {Amount}, TransactionDate: {TransactionDate}, Status: {Status}, CreatedAt: {CreatedAt}, UpdatedAt: {UpdatedAt}, Category: {Category}";
+    }
 }
 
 public class ExpenseCashFlow : CashFlow
@@ -46,5 +51,10 @@ public class ExpenseCashFlow : CashFlow
     public ExpenseCashFlow(Contract contract, User user, string description, float amount, DateTime transactionDate, PaymentStatus status, ExpensesCategory category) : base(contract, user, description, amount, transactionDate, status)
     {
         Category = category;
+    }
+
+    public override string ToString()
+    {
+        return $"Id: {Id}, Description: {Description}, Amount: {Amount}, TransactionDate: {TransactionDate}, Status: {Status}, CreatedAt: {CreatedAt}, UpdatedAt: {UpdatedAt}, Category: {Category}";
     }
 }

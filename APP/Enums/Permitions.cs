@@ -1,4 +1,5 @@
-public enum Permitions{
+public enum Permitions
+{
     READ_USERS,
     CREATE_USERS,
     UPDATE_USERS,

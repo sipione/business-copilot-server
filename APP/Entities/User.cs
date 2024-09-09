@@ -16,7 +16,7 @@ public class User
     public List<Stakeholder> Stakeholders { get; set; }
     public List<Voucher> Vouchers { get; set; }
     public List<Progress> Progresses { get; set; }
-    public List<Permitions> Permitions { get; set; }
+    public List<Permitions> UserPermitionsList { get; set; }
 
     public User(string name, string email, string password, UserRole role, string? profilePicture)
     {
@@ -36,19 +36,24 @@ public class User
         Stakeholders = new List<Stakeholder>();
         Vouchers = new List<Voucher>();
         Progresses = new List<Progress>();
-        Permitions = new List<Permitions>();
+        UserPermitionsList = new List<Permitions>();
     }
 
     public void AllowPermitionsByRole(){
-        var permitions = new List<Permitions>();
-        var allPermitions = Enum.GetValues(typeof(Permitions)).Cast<Permitions>().ToList();
+        List<Permitions> allPermitions = Permitions.GetValues(typeof(Permitions)).Cast<Permitions>().ToList();
 
         if(UserRole.ADMIN == this.Role){
-            permitions = allPermitions;
+            this.UserPermitionsList = allPermitions;
+        }else if(UserRole.ORDINARY == this.Role || UserRole.VIP == this.Role){
+            this.UserPermitionsList = allPermitions.Where(p => !p.ToString().Contains("USERS")).ToList();
+        }else if(UserRole.EDITOR == this.Role){
+            this.UserPermitionsList = allPermitions.Where(p => !p.ToString().Contains("USERS") || !p.ToString().Contains("DELETE") || !p.ToString().Contains("CREATE")).ToList();
+        }else if(UserRole.GUEST == this.Role){
+            this.UserPermitionsList = allPermitions.Where(p => !p.ToString().Contains("USERS") && p.ToString().Contains("READ")).ToList();
         }
     }
 
-    public string toString()
+    public override string ToString()
     {
         return $"Id: {Id}, Name: {Name}, Email: {Email}, Role: {Role}, Status: {Status}, CreatedAt: {CreatedAt}, UpdatedAt: {UpdatedAt}";
     }
