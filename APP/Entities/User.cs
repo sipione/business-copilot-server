@@ -1,3 +1,4 @@
+namespace APP.Entities;
 public class User
 {
     public Guid Id { get; set; }
@@ -36,6 +37,10 @@ public class User
         Stakeholders = new List<Stakeholder>();
         Vouchers = new List<Voucher>();
         Progresses = new List<Progress>();
+        UserPermitionsList = new List<Permitions>();
+    }
+
+    public User() { 
         UserPermitionsList = new List<Permitions>();
     }
 

@@ -1,3 +1,4 @@
+namespace APP.Entities;
 public class Progress
 {
     public Guid Id { get; set; }
@@ -20,6 +21,8 @@ public class Progress
         UpdatedAt = DateTime.Now;
         FilesPaths = new List<string>();
     }
+
+    public Progress() { }
 
     public override string ToString()
     {

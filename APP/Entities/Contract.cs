@@ -1,3 +1,5 @@
+namespace APP.Entities;
+
 public class Contract
 {
     public Guid Id { get; set; }
@@ -46,6 +48,8 @@ public class Contract
         CreatedAt = DateTime.Now;
         UpdatedAt = DateTime.Now;
     }
+
+    public Contract() { }
 
     public override string ToString()
     {

@@ -1,3 +1,4 @@
+namespace APP.Entities;
 public class SubAccounts
 {
     public Guid Id { get; set; }
@@ -28,6 +29,8 @@ public class SubAccounts
         Progresses = new List<Progress>();
         PermitionsList = new List<Permitions>();
     }
+
+    public SubAccounts() { }
 
     public void AllowPermitionsByRole()
     {

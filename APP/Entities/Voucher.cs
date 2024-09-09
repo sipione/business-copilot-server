@@ -1,3 +1,4 @@
+namespace APP.Entities;
 public class Voucher
 {
     public Guid Id { get; set; }
@@ -27,6 +28,8 @@ public class Voucher
         UpdatedAt = DateTime.Now;
         Contracts = new List<Contract>();
     }
+
+    public Voucher() { }
 
     public void UseVoucher()
     {

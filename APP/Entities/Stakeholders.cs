@@ -1,3 +1,4 @@
+namespace APP.Entities;
 public class Stakeholder{
     public Guid Id { get; set; }
     public User User { get; set; }
@@ -39,6 +40,8 @@ public class Stakeholder{
         Vouchers = new List<Voucher>();
         Contracts = new List<Contract>();
     }
+
+    public Stakeholder() { }
 
     public override string ToString()
     {

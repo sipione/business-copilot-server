@@ -1,3 +1,4 @@
+namespace APP.Entities;
 public class CashFlow
 {
     public Guid Id { get; set; }
@@ -23,6 +24,8 @@ public class CashFlow
         UpdatedAt = DateTime.Now;
     }
 
+    public CashFlow(){}
+
     public override string ToString()
     {
         return $"Id: {Id}, Description: {Description}, Amount: {Amount}, TransactionDate: {TransactionDate}, Status: {Status}, CreatedAt: {CreatedAt}, UpdatedAt: {UpdatedAt}";
@@ -38,6 +41,8 @@ public class IncomeCashFlow : CashFlow
         Category = category;
     }
 
+    public IncomeCashFlow(){}
+
     public override string ToString()
     {
         return $"Id: {Id}, Description: {Description}, Amount: {Amount}, TransactionDate: {TransactionDate}, Status: {Status}, CreatedAt: {CreatedAt}, UpdatedAt: {UpdatedAt}, Category: {Category}";
@@ -52,6 +57,8 @@ public class ExpenseCashFlow : CashFlow
     {
         Category = category;
     }
+
+    public ExpenseCashFlow(){}
 
     public override string ToString()
     {
