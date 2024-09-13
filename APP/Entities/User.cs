@@ -38,6 +38,7 @@ public class User
         Vouchers = new List<Voucher>();
         Progresses = new List<Progress>();
         UserPermitionsList = new List<Permitions>();
+        this.AllowPermitionsByRole();
     }
 
     public User() { 
@@ -52,7 +53,7 @@ public class User
         }else if(UserRole.ORDINARY == this.Role || UserRole.VIP == this.Role){
             this.UserPermitionsList = allPermitions.Where(p => !p.ToString().Contains("USERS")).ToList();
         }else if(UserRole.EDITOR == this.Role){
-            this.UserPermitionsList = allPermitions.Where(p => !p.ToString().Contains("USERS") || !p.ToString().Contains("DELETE") || !p.ToString().Contains("CREATE")).ToList();
+            this.UserPermitionsList = allPermitions.Where(p => !p.ToString().Contains("USERS") && !p.ToString().Contains("DELETE") && !p.ToString().Contains("CREATE")).ToList();
         }else if(UserRole.GUEST == this.Role){
             this.UserPermitionsList = allPermitions.Where(p => !p.ToString().Contains("USERS") && p.ToString().Contains("READ")).ToList();
         }

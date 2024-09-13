@@ -8,10 +8,12 @@ public class UserRepository : IUserRepository{
         _context = context;
     }
     public async Task<IEnumerable<User>> GetAll(){
-        return await _context.Users.ToListAsync();
+        IEnumerable<User> users = await _context.Users.ToListAsync();
+        return users;
     }
     public async Task<User> GetById(Guid id){
-        return await _context.Users.FindAsync(id);
+        User user = await _context.Users.FindAsync(id);
+        return user;
     }
     public async Task<User> GetByEmail(string email){
         return await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
@@ -28,7 +30,9 @@ public class UserRepository : IUserRepository{
     }
     public async Task<User> Delete(Guid id){
         var user = await _context.Users.FindAsync(id);
-        if(user == null) return null;
+        if(user == null){
+            throw new Exception("User not found");
+        }
         _context.Users.Remove(user);
         await _context.SaveChangesAsync();
         return user;

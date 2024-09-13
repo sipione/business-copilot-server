@@ -2,6 +2,8 @@ using REPO.Data;
 using Microsoft.AspNetCore.Builder;
 using APP.Entities;
 using APP.Interfaces.Repository;
+using APP.Interfaces.Services;
+using APP.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +23,7 @@ builder.Services.AddScoped<IContractRepository, ContractRepository>();
 builder.Services.AddScoped<IProgressRepository, ProgressRepository>();
 builder.Services.AddScoped<IStakeholderRepository, StakeholderRepository>();
 builder.Services.AddScoped<ISubAccountRepository, SubAccountRepository>();
+builder.Services.AddScoped<ICryptographyServices, CryptographyServices>();
 
 var app = builder.Build();
 
