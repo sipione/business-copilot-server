@@ -2,8 +2,8 @@ namespace APP.Entities;
 public class Voucher
 {
     public Guid Id { get; set; }
-    public User User { get; set; }
-    public Stakeholder? Stackholder { get; set; }
+    public Guid UserId { get; set; }
+    public Guid? StackholderId { get; set; }
     public string Code { get; set; }
     public decimal Value { get; set; }
     public DateTime? ExpirationDate { get; set; }
@@ -14,25 +14,24 @@ public class Voucher
     public DateTime UpdatedAt { get; set; }
     public List<Contract> Contracts { get; set; }
 
-    public Voucher(User user, Stakeholder stackholder, string code, decimal value, DateTime expirationDate, int usageLimit)
+    public Voucher(Guid userId, Guid? stackholderId, string code, decimal value, DateTime? expirationDate, int? usageLimit, int usageCount, AccountStatus status)
     {
-        User = user;
-        Stackholder = stackholder;
+        Id = Guid.NewGuid();
+        UserId = userId;
+        StackholderId = stackholderId;
         Code = code;
         Value = value;
         ExpirationDate = expirationDate;
         UsageLimit = usageLimit;
-        UsageCount = 0;
-        Status = AccountStatus.ACTIVE;
+        UsageCount = usageCount;
+        Status = status;
         CreatedAt = DateTime.Now;
         UpdatedAt = DateTime.Now;
-        Contracts = new List<Contract>();
     }
 
     public Voucher() { }
 
-    public void UseVoucher()
-    {
+    public void UseVoucher(){
         if (UsageCount < UsageLimit)
         {
             UsageCount++;
@@ -43,8 +42,7 @@ public class Voucher
         }
     }
 
-    public override string ToString()
-    {
-        return $"Id: {Id}, Code: {Code}, Value: {Value}, ExpirationDate: {ExpirationDate}, UsageLimit: {UsageLimit}, UsageCount: {UsageCount}, Status: {Status}, CreatedAt: {CreatedAt}, UpdatedAt: {UpdatedAt}";
+    public override string ToString(){
+        return $"Id: {Id}, UserId: {UserId}, StackholderId: {StackholderId}, Code: {Code}, Value: {Value}, ExpirationDate: {ExpirationDate}, UsageLimit: {UsageLimit}, UsageCount: {UsageCount}, Status: {Status}, CreatedAt: {CreatedAt}, UpdatedAt: {UpdatedAt}";
     }
 }

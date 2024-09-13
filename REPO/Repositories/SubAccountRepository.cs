@@ -24,7 +24,7 @@ public class SubAccountRepository : ISubAccountRepository
     
     public async Task<IEnumerable<SubAccounts>> GetByUser(Guid userId)
     {
-        return await _context.SubAccounts.Where(s => s.User.Id == userId).ToListAsync();
+        return await _context.SubAccounts.Where(s => s.UserId == userId).ToListAsync();
     }
     
     public async Task<SubAccounts> Create(SubAccounts subAccount)

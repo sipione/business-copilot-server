@@ -15,33 +15,111 @@ public class CashFlowController : ControllerBase{
         _cashFlowRepository = cashFlowRepository;
     }
 
-    [HttpGet(Name = "GetCashFlows")]
-    public async Task<IEnumerable<CashFlow>> Get()
+    [HttpGet("income", Name = "GetIncomeCashFlows")]
+    public async Task<IActionResult> GetIncomeCashFlows()
     {
-        return await _cashFlowRepository.GetAll();
+        try{
+            IEnumerable<IncomeCashFlow> cashFlows = await _cashFlowRepository.GetIncomeCashFlows();
+            return StatusCode(200, cashFlows);
+        }catch(Exception e){
+            _logger.LogError(e.Message);
+            return StatusCode(500, e.Message);
+        }
     }
 
-    [HttpGet("{id}", Name = "GetCashFlow")]
-    public async Task<CashFlow> Get(Guid id)
+    [HttpGet("expense", Name = "GetExpenseCashFlows")]
+    public async Task<IActionResult> GetExpenseCashFlows()
     {
-        return await _cashFlowRepository.GetById(id);
+        try{
+            IEnumerable<ExpenseCashFlow> cashFlows = await _cashFlowRepository.GetExpenseCashFlows();
+            return StatusCode(200, cashFlows);
+        }catch(Exception e){
+            _logger.LogError(e.Message);
+            return StatusCode(500, e.Message);
+        }
     }
 
-    [HttpPost(Name = "CreateCashFlow")]
-    public async Task<CashFlow> Create(CashFlow cashFlow)
+    [HttpGet("income/{id}", Name = "GetIncomeCashFlowById")]
+    public async Task<IActionResult> GetIncomeCashFlowById(Guid id)
     {
-        return await _cashFlowRepository.Create(cashFlow);
+        try{
+            IncomeCashFlow cashFlow = await _cashFlowRepository.GetIncomeCashFlowById(id);
+            if(cashFlow == null){
+                return StatusCode(404, "Income Cash Flow not found");
+            }
+            return StatusCode(200, cashFlow);
+        }catch(Exception e){
+            _logger.LogError(e.Message);
+            return StatusCode(500, e.Message);
+        }
     }
 
-    [HttpPut(Name = "UpdateCashFlow")]
-    public async Task<CashFlow> Update(CashFlow cashFlow)
+    [HttpGet("expense/{id}", Name = "GetExpenseCashFlowById")]
+    public async Task<IActionResult> GetExpenseCashFlowById(Guid id)
     {
-        return await _cashFlowRepository.Update(cashFlow);
+        try{
+            ExpenseCashFlow cashFlow = await _cashFlowRepository.GetExpenseCashFlowById(id);
+            if(cashFlow == null){
+                return StatusCode(404, "Expense Cash Flow not found");
+            }
+            return StatusCode(200, cashFlow);
+        }catch(Exception e){
+            _logger.LogError(e.Message);
+            return StatusCode(500, e.Message);
+        }
     }
 
-    [HttpDelete("{id}", Name = "DeleteCashFlow")]
-    public async Task<CashFlow> Delete(Guid id)
-    {
-        return await _cashFlowRepository.Delete(id);
+    [HttpPost("income", Name = "CreateIncomeCashFlow")]
+    public async Task<IActionResult> CreateIncomeCashFlow([FromBody] CreateIncomeCashFlowDto dto){
+        IncomeCashFlow cashFlow = new IncomeCashFlow(dto.ContractId, dto.UserId, dto.Description, dto.Amount, dto.TransactionDate, dto.Status, dto.Category);
+
+        try{
+            await _cashFlowRepository.CreateIncomeCashFlow(cashFlow);
+            return StatusCode(201, cashFlow);
+        }catch(Exception e){
+            _logger.LogError(e.Message);
+            return StatusCode(500, e.Message);
+        }
     }
+
+    [HttpPost("expense", Name = "CreateExpenseCashFlow")]
+    public async Task<IActionResult> CreateExpenseCashFlow([FromBody] CreateExpenseCashFlowDto dto){
+        ExpenseCashFlow cashFlow = new ExpenseCashFlow(dto.ContractId, dto.UserId, dto.Description, dto.Amount, dto.TransactionDate, dto.Status, dto.Category);
+
+        try{
+            await _cashFlowRepository.CreateExpenseCashFlow(cashFlow);
+            return StatusCode(201, cashFlow);
+        }catch(Exception e){
+            _logger.LogError(e.Message);
+            return StatusCode(500, e.Message);
+        }
+    }
+
+    [HttpPut("income", Name = "UpdateIncomeCashFlow")]
+    public async Task<IActionResult> UpdateIncomeCashFlow([FromBody] UpdateIncomeCashFlowDto dto){
+
+        try{
+            IncomeCashFlow incomeCashFlowExists = await _cashFlowRepository.GetIncomeCashFlowById(dto.Id);
+            if(incomeCashFlowExists == null){
+                return StatusCode(404, "CashFlow not found");
+            }
+            incomeCashFlowExists.ContractId = dto.ContractId ?? incomeCashFlowExists.ContractId;
+            incomeCashFlowExists.Description = dto.Description ?? incomeCashFlowExists.Description;
+            incomeCashFlowExists.Amount = dto.Amount ?? incomeCashFlowExists.Amount;
+            incomeCashFlowExists.TransactionDate = dto.TransactionDate ?? incomeCashFlowExists.TransactionDate;
+            incomeCashFlowExists.Status = dto.Status ?? incomeCashFlowExists.Status;
+            incomeCashFlowExists.Category = dto.Category ?? incomeCashFlowExists.Category;
+            await _cashFlowRepository.UpdateIncomeCashFlow(incomeCashFlowExists);
+            return StatusCode(200, incomeCashFlowExists);
+        }catch(Exception e){
+            _logger.LogError(e.Message);
+            return StatusCode(500, e.Message);
+        }
+    }
+
+    // [HttpDelete("{id}", Name = "DeleteCashFlow")]
+    // public async Task<CashFlow> Delete(Guid id)
+    // {
+    //     return await _cashFlowRepository.Delete(id);
+    // }
 }

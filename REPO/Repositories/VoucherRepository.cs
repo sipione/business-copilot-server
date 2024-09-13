@@ -23,7 +23,7 @@ public class VoucherRepository : IVoucherRepository
     
     public async Task<IEnumerable<Voucher>> GetByUser(Guid userId)
     {
-        return await _context.Vouchers.Where(v => v.User.Id == userId).ToListAsync();
+        return await _context.Vouchers.Where(v => v.UserId == userId).ToListAsync();
     }
     
     public async Task<IEnumerable<Voucher>> GetByDateRange(DateTime startDate, DateTime endDate)

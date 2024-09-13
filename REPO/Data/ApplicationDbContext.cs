@@ -11,7 +11,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<Stakeholder> Stakeholders { get; set; }
     public DbSet<Contract> Contracts { get; set; }
     public DbSet<Voucher> Vouchers { get; set; }
-    public DbSet<CashFlow> CashFlows { get; set; }
+    public DbSet<IncomeCashFlow> IncomeCashFlows { get; set; }
+    public DbSet<ExpenseCashFlow> ExpenseCashFlows { get; set; }
     public DbSet<Progress> Progresses { get; set; }
     public DbSet<SubAccounts> SubAccounts { get; set; }
 

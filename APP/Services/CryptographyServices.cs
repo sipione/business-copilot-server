@@ -9,8 +9,8 @@ public class CryptographyServices : ICryptographyServices
 {
     public string Encrypt(string text)
     {
-        byte[] bytes = SHA256.HashData(Encoding.UTF8.GetBytes(text)); // Corrigido o nome da classe para SHA256
-        return Convert.ToBase64String(bytes); // Use Base64 para converter o byte[] de volta para string
+        byte[] bytes = SHA256.HashData(Encoding.UTF8.GetBytes(text));
+        return Convert.ToBase64String(bytes);
     }
 
     public bool ValidateCryptography(string text, string cryptography)

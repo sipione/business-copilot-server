@@ -20,11 +20,11 @@ public class ContractRepository : IContractRepository
     }
     public async Task<IEnumerable<Contract>> GetByStakeholder(Guid stakeholderId)
     {
-        return await _context.Contracts.Where(c => c.Stakeholder.Id == stakeholderId).ToListAsync();
+        return await _context.Contracts.Where(c => c.StakeholderId == stakeholderId).ToListAsync();
     }
     public async Task<IEnumerable<Contract>> GetByUser(Guid userId)
     {
-        return await _context.Contracts.Where(c => c.User.Id == userId).ToListAsync();
+        return await _context.Contracts.Where(c => c.UserId == userId).ToListAsync();
     }
     public async Task<IEnumerable<Contract>> GetByStatus(ContractStatus status)
     {

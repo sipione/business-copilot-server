@@ -2,63 +2,62 @@ using APP.Entities;
 using APP.Interfaces.Repository;
 using REPO.Data;
 using Microsoft.EntityFrameworkCore;
-public class CashFlowRepository : ICashFlowRepository
-{
+public class CashFlowRepository : ICashFlowRepository{
     private readonly ApplicationDbContext _context;
-
-    public CashFlowRepository(ApplicationDbContext context)
-    {
+    public CashFlowRepository(ApplicationDbContext context){
         _context = context;
     }
-
-    public async Task<IEnumerable<CashFlow>> GetAll()
-    {
-        return await _context.CashFlows.ToListAsync();
+    public async Task<IEnumerable<IncomeCashFlow>> GetIncomeCashFlows(){
+        IEnumerable<IncomeCashFlow> cashFlows = await _context.IncomeCashFlows.ToListAsync();
+        return cashFlows;
     }
-    
-    public async Task<CashFlow> GetById(Guid id)
-    {
-        return await _context.CashFlows.FindAsync(id);
+    public async Task<IEnumerable<ExpenseCashFlow>> GetExpenseCashFlows(){
+        IEnumerable<ExpenseCashFlow> cashFlows = await _context.ExpenseCashFlows.ToListAsync();
+        return cashFlows;
     }
-    
-    public async Task<IEnumerable<CashFlow>> GetByUser(Guid userId)
-    {
-        return await _context.CashFlows.Where(c => c.User.Id == userId).ToListAsync();
+    public async Task<IncomeCashFlow> GetIncomeCashFlowById(Guid id){
+        IncomeCashFlow cashFlow = await _context.IncomeCashFlows.FindAsync(id);
+        return cashFlow;
     }
-    
-    public async Task<IEnumerable<CashFlow>> GetByDate(DateTime date)
-    {
-        return await _context.CashFlows.Where(c => c.TransactionDate == date).ToListAsync();
+    public async Task<ExpenseCashFlow> GetExpenseCashFlowById(Guid id){
+        ExpenseCashFlow cashFlow = await _context.ExpenseCashFlows.FindAsync(id);
+        return cashFlow;
     }
-    
-    public async Task<IEnumerable<CashFlow>> GetByDateRange(DateTime startDate, DateTime endDate)
-    {
-        return await _context.CashFlows.Where(c => c.TransactionDate >= startDate && c.TransactionDate <= endDate).ToListAsync();
-    }
-    
-    public async Task<CashFlow> Create(CashFlow cashFlow)
-    {
-        _context.CashFlows.Add(cashFlow);
+    public async Task<IncomeCashFlow> CreateIncomeCashFlow(IncomeCashFlow cashFlow){
+        _context.IncomeCashFlows.Add(cashFlow);
         await _context.SaveChangesAsync();
         return cashFlow;
     }
-    
-    public async Task<CashFlow> Update(CashFlow cashFlow)
-    {
-        _context.CashFlows.Update(cashFlow);
+    public async Task<ExpenseCashFlow> CreateExpenseCashFlow(ExpenseCashFlow cashFlow){
+        _context.ExpenseCashFlows.Add(cashFlow);
         await _context.SaveChangesAsync();
         return cashFlow;
     }
-    
-    public async Task<CashFlow> Delete(Guid id)
-    {
-        var cashFlow = await _context.CashFlows.FindAsync(id);
-        if (cashFlow == null)
-        {
-            return null;
+    public async Task<IncomeCashFlow> UpdateIncomeCashFlow(IncomeCashFlow cashFlow){
+        _context.IncomeCashFlows.Update(cashFlow);
+        await _context.SaveChangesAsync();
+        return cashFlow;
+    }
+    public async Task<ExpenseCashFlow> UpdateExpenseCashFlow(ExpenseCashFlow cashFlow){
+        _context.ExpenseCashFlows.Update(cashFlow);
+        await _context.SaveChangesAsync();
+        return cashFlow;
+    }
+    public async Task<IncomeCashFlow> DeleteIncomeCashFlow(Guid id){
+        var cashFlow = await _context.IncomeCashFlows.FindAsync(id);
+        if(cashFlow == null){
+            throw new Exception("Income Cash Flow not found");
         }
-    
-        _context.CashFlows.Remove(cashFlow);
+        _context.IncomeCashFlows.Remove(cashFlow);
+        await _context.SaveChangesAsync();
+        return cashFlow;
+    }
+    public async Task<ExpenseCashFlow> DeleteExpenseCashFlow(Guid id){
+        var cashFlow = await _context.ExpenseCashFlows.FindAsync(id);
+        if(cashFlow == null){
+            throw new Exception("Expense Cash Flow not found");
+        }
+        _context.ExpenseCashFlows.Remove(cashFlow);
         await _context.SaveChangesAsync();
         return cashFlow;
     }

@@ -3,8 +3,8 @@ namespace APP.Entities;
 public class Contract
 {
     public Guid Id { get; set; }
-    public User User { get; set; }
-    public Stakeholder Stakeholder { get; set; }
+    public Guid UserId { get; set; }
+    public Guid StakeholderId { get; set; }
     public string Title { get; set; }
     public string? Description { get; set; }
     public float InitialAmount { get; set; }
@@ -24,11 +24,11 @@ public class Contract
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 
-    public Contract(User user, Stakeholder stakeholder, string title, string? description, float initialAmount, float? discount, int? installments, float? interest, float? penalty, float? totalAmount, float? paidAmount, float? remainingAmount, string? documentPath, Voucher? voucher, PaymentStatus paymentStatus, ContractStatus contractStatus, DateTime startDate, DateTime? endDate)
+    public Contract(Guid userId, Guid stakeholderId, string title, string description, float initialAmount, float discount, int installments, float interest, float penalty, float totalAmount, float paidAmount, float remainingAmount, string documentPath, Voucher voucher, PaymentStatus paymentStatus, ContractStatus contractStatus, DateTime startDate, DateTime endDate)
     {
         Id = Guid.NewGuid();
-        User = user;
-        Stakeholder = stakeholder;
+        UserId = userId;
+        StakeholderId = stakeholderId;
         Title = title;
         Description = description;
         InitialAmount = initialAmount;
@@ -51,8 +51,7 @@ public class Contract
 
     public Contract() { }
 
-    public override string ToString()
-    {
-        return $"Id: {Id}, Title: {Title}, InitialAmount: {InitialAmount}, Discount: {Discount}, Installments: {Installments}, Interest: {Interest}, Penalty: {Penalty}, TotalAmount: {TotalAmount}, PaidAmount: {PaidAmount}, RemainingAmount: {RemainingAmount}, PaymentStatus: {PaymentStatus}, ContractStatus: {ContractStatus}, StartDate: {StartDate}, EndDate: {EndDate}, CreatedAt: {CreatedAt}, UpdatedAt: {UpdatedAt}";
+    public override string ToString(){
+        return $"Id: {Id}, Title: {Title}, Description: {Description}, InitialAmount: {InitialAmount}, Discount: {Discount}, Installments: {Installments}, Interest: {Interest}, Penalty: {Penalty}, TotalAmount: {TotalAmount}, PaidAmount: {PaidAmount}, RemainingAmount: {RemainingAmount}, DocumentPath: {DocumentPath}, PaymentStatus: {PaymentStatus}, ContractStatus: {ContractStatus}, StartDate: {StartDate}, EndDate: {EndDate}, CreatedAt: {CreatedAt}, UpdatedAt: {UpdatedAt}";
     }
 }

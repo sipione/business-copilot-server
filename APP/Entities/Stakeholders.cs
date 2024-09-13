@@ -1,7 +1,7 @@
 namespace APP.Entities;
 public class Stakeholder{
     public Guid Id { get; set; }
-    public User User { get; set; }
+    public Guid UserId { get; set; }
     public string Name { get; set; }
     public string Email { get; set; }
     public string? Phone { get; set; }
@@ -19,10 +19,10 @@ public class Stakeholder{
     public List<Voucher> Vouchers { get; set; }
     public List<Contract> Contracts { get; set; }
 
-    public Stakeholder(User user, string name, string email, StakeholderType type, string? phone, string? address, string? city, string? state, string? country, string? zipCode)
+    public Stakeholder(Guid userId, string name, string email, string? phone, string? address, string? city, string? state, string? country, string? zipCode, StakeholderType type, AccountStatus status)
     {
         Id = Guid.NewGuid();
-        User = user;
+        UserId = userId;
         Name = name;
         Email = email;
         Phone = phone;
@@ -32,19 +32,14 @@ public class Stakeholder{
         Country = country;
         ZipCode = zipCode;
         Type = type;
-        Status = AccountStatus.ACTIVE;
+        Status = status;
         CreatedAt = DateTime.Now;
         UpdatedAt = DateTime.Now;
-        IncomeCashFlows = new List<IncomeCashFlow>();
-        ExpenseCashFlows = new List<ExpenseCashFlow>();
-        Vouchers = new List<Voucher>();
-        Contracts = new List<Contract>();
     }
 
     public Stakeholder() { }
 
-    public override string ToString()
-    {
-        return $"Id: {Id}, Name: {Name}, Email: {Email}, Type: {Type}, Status: {Status}, CreatedAt: {CreatedAt}, UpdatedAt: {UpdatedAt}";
+    public override string ToString(){
+        return $"Id: {Id}, Name: {Name}, Email: {Email}, Phone: {Phone}, Address: {Address}, City: {City}, State: {State}, Country: {Country}, ZipCode: {ZipCode}, Type: {Type}, Status: {Status}, CreatedAt: {CreatedAt}, UpdatedAt: {UpdatedAt}";
     }
 }

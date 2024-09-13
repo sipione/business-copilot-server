@@ -29,7 +29,7 @@ public class StakeholderRepository : IStakeholderRepository
     
     public async Task<Stakeholder> GetByUser(Guid userId)
     {
-        return await _context.Stakeholders.FirstOrDefaultAsync(s => s.User.Id == userId);
+        return await _context.Stakeholders.FirstOrDefaultAsync(s => s.UserId == userId);
     }
     
     public async Task<Stakeholder> GetByEmail(string email)
