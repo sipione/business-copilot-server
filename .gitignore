@@ -753,3 +753,11 @@ __pycache__/
 
 # End of https://mrkandreev.name/snippets/gitignore-generator/#DotnetCore,ASPNETCore,c#
 *.db*
+*.db-shm
+*.db-wal
+*.db-journal
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.sqlite-journal
+*.png

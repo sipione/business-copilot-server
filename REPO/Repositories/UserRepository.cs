@@ -8,7 +8,7 @@ public class UserRepository : IUserRepository{
         _context = context;
     }
     public async Task<IEnumerable<User>> GetAll(){
-        IEnumerable<User> users = await _context.Users.ToListAsync();
+        IEnumerable<User> users = await _context.Users.Include(u => u.Stakeholders).Include(u => u.Contracts).Include(u => u.Vouchers).Include(u => u.SubAccounts).Include(u => u.IncomeCashFlows).Include(u => u.ExpenseCashFlows).Include(u => u.Progresses).ToListAsync();
         return users;
     }
     public async Task<User> GetById(Guid id){
