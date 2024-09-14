@@ -21,6 +21,11 @@ public class SubAccountRepository : ISubAccountRepository
     {
         return await _context.SubAccounts.FindAsync(id);
     }
+
+    public async Task<SubAccounts> GetByEmail(string email)
+    {
+        return await _context.SubAccounts.FirstOrDefaultAsync(s => s.Email == email);
+    }
     
     public async Task<IEnumerable<SubAccounts>> GetByUser(Guid userId)
     {

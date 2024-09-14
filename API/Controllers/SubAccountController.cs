@@ -17,32 +17,91 @@ public class SubAccountController : ControllerBase{
     }
 
     [HttpGet(Name = "GetSubAccounts")]
-    public async Task<IEnumerable<SubAccounts>> Get()
+    public async Task<IActionResult> Get()
     {
-        return await _subAccountRepository.GetAll();
+        try{
+            IEnumerable<SubAccounts> subAccounts = await _subAccountRepository.GetAll();
+            return Ok(subAccounts);
+        }catch(Exception e){
+            return StatusCode(500, e.Message);
+        }
     }
 
     [HttpGet("{id}", Name = "GetSubAccount")]
-    public async Task<SubAccounts> Get(Guid id)
+    public async Task<IActionResult> Get(Guid id)
     {
-        return await _subAccountRepository.GetById(id);
+        try{
+            SubAccounts subAccount = await _subAccountRepository.GetById(id);
+            return Ok(subAccount);
+        }catch(Exception e){
+            return StatusCode(500, e.Message);
+        }
     }
 
     [HttpPost(Name = "CreateSubAccount")]
-    public async Task<SubAccounts> Create(SubAccounts subAccount)
+    public async Task<IActionResult> Create(CreateSubAccountDto subAccountDto)
     {
-        return await _subAccountRepository.Create(subAccount);
+        try{
+            SubAccounts subAccountExist = await _subAccountRepository.GetByEmail(subAccountDto.Email);
+            if(subAccountExist != null){
+                return StatusCode(400, "SubAccount already exists");
+            }
+            var subAccount = new SubAccounts(subAccountDto.UserId, subAccountDto.StakeholderId, subAccountDto.Name, subAccountDto.Description, subAccountDto.Email, subAccountDto.Password, subAccountDto.Role);
+            var createdSubAccount = await _subAccountRepository.Create(subAccount);
+            return StatusCode(201, createdSubAccount);
+        }catch(Exception e){
+            return StatusCode(500, e.Message);
+        }
     }
 
     [HttpPut(Name = "UpdateSubAccount")]
-    public async Task<SubAccounts> Update(SubAccounts subAccount)
+    public async Task<IActionResult> Update(UpdateSubAccountDto subAccountDto)
     {
-        return await _subAccountRepository.Update(subAccount);
+        try{
+            SubAccounts subAccount = await _subAccountRepository.GetById(subAccountDto.Id);
+            if(subAccount == null){
+                return StatusCode(404, "SubAccount not found");
+            }
+            if(subAccountDto.StakeholderId != null){
+                subAccount.StakeholderId = (Guid)subAccountDto.StakeholderId;
+            }
+            if(subAccountDto.Name != null){
+                subAccount.Name = subAccountDto.Name;
+            }
+            if(subAccountDto.Description != null){
+                subAccount.Description = subAccountDto.Description;
+            }
+            if(subAccountDto.Email != null){
+                subAccount.Email = subAccountDto.Email;
+            }
+            if(subAccountDto.Password != null){
+                subAccount.Password = subAccountDto.Password;
+            }
+            if(subAccountDto.Status != null){
+                subAccount.Status = (AccountStatus)subAccountDto.Status;
+            }
+            if(subAccountDto.Role != null){
+                subAccount.Role = (SubAccountRole)subAccountDto.Role;
+                subAccount.AllowPermitionsByRole();
+            }
+            var updatedSubAccount = await _subAccountRepository.Update(subAccount);
+            return Ok(updatedSubAccount);
+        }catch(Exception e){
+            return StatusCode(500, e.Message);
+        }
     }
 
     [HttpDelete("{id}", Name = "DeleteSubAccount")]
-    public async Task<SubAccounts> Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid id)
     {
-        return await _subAccountRepository.Delete(id);
+        try{
+            var subAccount = await _subAccountRepository.Delete(id);
+            if(subAccount == null){
+                return StatusCode(404, "SubAccount not found");
+            }
+            return Ok(subAccount);
+        }catch(Exception e){
+            return StatusCode(500, e.Message);
+        }
     }
 }

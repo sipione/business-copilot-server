@@ -1,5 +1,5 @@
 public enum SubAccountRole
 {
-    VIWER,
-    EDITOR
+    EDITOR,
+    VIWER
 }

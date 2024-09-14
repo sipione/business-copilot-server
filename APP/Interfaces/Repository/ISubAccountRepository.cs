@@ -4,6 +4,7 @@ public interface ISubAccountRepository
 {
     Task<IEnumerable<SubAccounts>> GetAll();
     Task<SubAccounts> GetById(Guid id);
+    Task<SubAccounts> GetByEmail(string email);
     Task<IEnumerable<SubAccounts>> GetByUser(Guid UserId);
     Task<SubAccounts> Create(SubAccounts subAccount);
     Task<SubAccounts> Update(SubAccounts subAccount);
