@@ -17,32 +17,81 @@ public class StakeholderController : ControllerBase{
     }
 
     [HttpGet(Name = "GetStakeholders")]
-    public async Task<IEnumerable<Stakeholder>> Get()
+    public async Task<IActionResult> Get()
     {
-        return await _stakeholderRepository.GetAll();
+        try{
+            var stakeholders = await _stakeholderRepository.GetAll();
+            return StatusCode(200, stakeholders);
+        }catch(Exception e){
+            return StatusCode(500, e.Message);
+        }
     }
 
     [HttpGet("{id}", Name = "GetStakeholder")]
-    public async Task<Stakeholder> Get(Guid id)
+    public async Task<IActionResult> Get(Guid id)
     {
-        return await _stakeholderRepository.GetById(id);
+        try{
+            var stakeholder = await _stakeholderRepository.GetById(id);
+            return StatusCode(200, stakeholder);
+        }catch(Exception e){
+            return StatusCode(500, e.Message);
+        }
     }
 
     [HttpPost(Name = "CreateStakeholder")]
-    public async Task<Stakeholder> Create(Stakeholder stakeholder)
+    public async Task<IActionResult> Create(CreateStakeholderDto stakeholderDto)
     {
-        return await _stakeholderRepository.Create(stakeholder);
+        try{
+            Stakeholder stakeholderExist = await _stakeholderRepository.GetByEmail(stakeholderDto.Email);
+            if(stakeholderExist != null){
+                return StatusCode(400, "Stakeholder already exists");
+            }
+            var stakeholder = new Stakeholder(stakeholderDto.UserId, stakeholderDto.Name, stakeholderDto.Email, stakeholderDto.Phone, stakeholderDto.Address, stakeholderDto.City, stakeholderDto.State, stakeholderDto.Country, stakeholderDto.ZipCode, stakeholderDto.Type, stakeholderDto.Status);
+            var createdStakeholder = await _stakeholderRepository.Create(stakeholder);
+            return StatusCode(201, createdStakeholder);
+        }catch(Exception e){
+            return StatusCode(500, e.Message);
+        }
     }
 
     [HttpPut(Name = "UpdateStakeholder")]
-    public async Task<Stakeholder> Update(Stakeholder stakeholder)
+    public async Task<IActionResult> Update(UpdateStakeholderDto stakeholderDto)
     {
-        return await _stakeholderRepository.Update(stakeholder);
+        try{
+            var stakeholder = await _stakeholderRepository.GetById(stakeholderDto.Id);
+            if(stakeholder == null){
+                return StatusCode(404, "Stakeholder not found");
+            }
+            
+            stakeholder.Name = stakeholderDto.Name ?? stakeholder.Name;
+            stakeholder.Email = stakeholderDto.Email ?? stakeholder.Email;
+            stakeholder.Phone = stakeholderDto.Phone ?? stakeholder.Phone;
+            stakeholder.Address = stakeholderDto.Address ?? stakeholder.Address;
+            stakeholder.City = stakeholderDto.City ?? stakeholder.City;
+            stakeholder.State = stakeholderDto.State ?? stakeholder.State;
+            stakeholder.Country = stakeholderDto.Country ?? stakeholder.Country;
+            stakeholder.ZipCode = stakeholderDto.ZipCode ?? stakeholder.ZipCode;
+            stakeholder.Type = stakeholderDto.Type ?? stakeholder.Type;
+            stakeholder.Status = stakeholderDto.Status ?? stakeholder.Status;
+
+            var updatedStakeholder = await _stakeholderRepository.Update(stakeholder);
+            return StatusCode(200, updatedStakeholder);
+        }catch(Exception e){
+            return StatusCode(500, e.Message);
+        }
     }
 
     [HttpDelete("{id}", Name = "DeleteStakeholder")]
-    public async Task<Stakeholder> Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid id)
     {
-        return await _stakeholderRepository.Delete(id);
+        try{
+            var stakeholder = await _stakeholderRepository.Delete(id);
+            if(stakeholder == null){
+                return StatusCode(404, "Stakeholder not found");
+            }
+            return StatusCode(200, stakeholder);
+        }catch(Exception e){
+            return StatusCode(500, e.Message);
+        }
     }
 }
