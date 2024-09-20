@@ -17,32 +17,107 @@ public class ContractController : ControllerBase{
     }
 
     [HttpGet(Name = "GetContracts")]
-    public async Task<IEnumerable<Contract>> Get()
+    public async Task<IActionResult> Get()
     {
-        return await _contractRepository.GetAll();
+        try{
+            var contracts = await _contractRepository.GetAll();
+            return Ok(contracts);
+        }catch(Exception ex){
+            _logger.LogError(ex, ex.Message);
+            return StatusCode(500, "Internal Server Error");
+        }
     }
 
     [HttpGet("{id}", Name = "GetContract")]
-    public async Task<Contract> Get(Guid id)
+    public async Task<IActionResult> Get(Guid id)
     {
-        return await _contractRepository.GetById(id);
+        try{
+            var contract = await _contractRepository.GetById(id);
+            if(contract == null)
+                return NotFound();
+            return Ok(contract);
+        }catch(Exception ex){
+            _logger.LogError(ex, ex.Message);
+            return StatusCode(500, "Internal Server Error");
+        }
     }
 
     [HttpPost(Name = "CreateContract")]
-    public async Task<Contract> Create(Contract contract)
+    public async Task<IActionResult> Create(CreateContractDto createContractDto)
     {
-        return await _contractRepository.Create(contract);
+        try{
+            var contract = new Contract(
+                createContractDto.UserId,
+                createContractDto.StakeholderId,
+                createContractDto.Title,
+                createContractDto.Description,
+                createContractDto.InitialAmount,
+                createContractDto.Discount,
+                createContractDto.Installments,
+                createContractDto.Interest,
+                createContractDto.Penalty,
+                createContractDto.TotalAmount,
+                createContractDto.PaidAmount,
+                createContractDto.RemainingAmount,
+                createContractDto.DocumentPath,
+                createContractDto.VoucherId,
+                createContractDto.PaymentStatus,
+                createContractDto.ContractStatus,
+                createContractDto.StartDate,
+                createContractDto.EndDate
+            );
+            var createdContract = await _contractRepository.Create(contract);
+            return CreatedAtRoute("GetContract", new { id = createdContract.Id }, createdContract);
+        }catch(Exception ex){
+            _logger.LogError(ex, ex.Message);
+            return StatusCode(500, "Internal Server Error");
+        }
     }
 
     [HttpPut(Name = "UpdateContract")]
-    public async Task<Contract> Update(Contract contract)
+    public async Task<IActionResult> Update(UpdateContractDto updateContractDto)
     {
-        return await _contractRepository.Update(contract);
+        try{
+            var contract = await _contractRepository.GetById(updateContractDto.Id);
+            if(contract == null){
+                return NotFound();
+            }
+            contract.StakeholderId = updateContractDto.StakeholderId ?? contract.StakeholderId;
+            contract.Title = updateContractDto.Title ?? contract.Title;
+            contract.Description = updateContractDto.Description ?? contract.Description;
+            contract.InitialAmount = updateContractDto.InitialAmount ?? contract.InitialAmount;
+            contract.Discount = updateContractDto.Discount ?? contract.Discount;
+            contract.Installments = updateContractDto.Installments ?? contract.Installments;
+            contract.Interest = updateContractDto.Interest ?? contract.Interest;
+            contract.Penalty = updateContractDto.Penalty ?? contract.Penalty;
+            contract.TotalAmount = updateContractDto.TotalAmount ?? contract.TotalAmount;
+            contract.PaidAmount = updateContractDto.PaidAmount ?? contract.PaidAmount;
+            contract.RemainingAmount = updateContractDto.RemainingAmount ?? contract.RemainingAmount;
+            contract.DocumentPath = updateContractDto.DocumentPath ?? contract.DocumentPath;
+            contract.VoucherId = updateContractDto.VoucherId ?? contract.VoucherId;
+            contract.PaymentStatus = updateContractDto.PaymentStatus ?? contract.PaymentStatus;
+            contract.ContractStatus = updateContractDto.ContractStatus ?? contract.ContractStatus;
+            contract.StartDate = updateContractDto.StartDate ?? contract.StartDate;
+            contract.EndDate = updateContractDto.EndDate ?? contract.EndDate;
+            var updatedContract = await _contractRepository.Update(contract);
+            return Ok(updatedContract);
+        }catch(Exception ex){
+            _logger.LogError(ex, ex.Message);
+            return StatusCode(500, "Internal Server Error");
+        }
     }
 
     [HttpDelete("{id}", Name = "DeleteContract")]
-    public async Task<Contract> Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid id)
     {
-        return await _contractRepository.Delete(id);
+        try{
+            var contract = await _contractRepository.Delete(id);
+            if(contract == null)
+                return NotFound();
+            return Ok(contract);
+        }catch(Exception ex){
+            _logger.LogError(ex, ex.Message);
+            return StatusCode(500, "Internal Server Error");
+        }
     }
 }

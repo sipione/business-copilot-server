@@ -16,7 +16,7 @@ public class Contract
     public float? PaidAmount { get; set; }
     public float? RemainingAmount { get; set; }
     public string? DocumentPath { get; set; }
-    public Voucher? Voucher { get; set; }
+    public Guid? VoucherId { get; set; }
     public PaymentStatus PaymentStatus { get; set; }
     public ContractStatus ContractStatus { get; set; }
     public DateTime StartDate { get; set; }
@@ -24,7 +24,7 @@ public class Contract
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 
-    public Contract(Guid userId, Guid stakeholderId, string title, string description, float initialAmount, float discount, int installments, float interest, float penalty, float totalAmount, float paidAmount, float remainingAmount, string documentPath, Voucher voucher, PaymentStatus paymentStatus, ContractStatus contractStatus, DateTime startDate, DateTime endDate)
+    public Contract(Guid userId, Guid stakeholderId, string title, string description, float initialAmount, float? discount, int? installments, float? interest, float? penalty, float? totalAmount, float? paidAmount, float? remainingAmount, string documentPath, Guid? voucherId, PaymentStatus paymentStatus, ContractStatus contractStatus, DateTime startDate, DateTime? endDate)
     {
         Id = Guid.NewGuid();
         UserId = userId;
@@ -40,7 +40,7 @@ public class Contract
         PaidAmount = paidAmount;
         RemainingAmount = remainingAmount;
         DocumentPath = documentPath;
-        Voucher = voucher;
+        VoucherId = voucherId;
         PaymentStatus = paymentStatus;
         ContractStatus = contractStatus;
         StartDate = startDate;
