@@ -21,14 +21,13 @@ public class User
     public List<Progress> Progresses { get; set; }
     public List<Permitions> UserPermitionsList { get; set; }
 
-    public User(string name, string email, string password, UserRole role, string? profilePicture)
-    {
+    public User(string name, string email, string password, UserRole role, string? profilePicture, AccountStatus? accountStatus){
         Id = Guid.NewGuid();
         Name = name;
         Email = email;
         Password = password;
         Role = role;
-        Status = AccountStatus.ACTIVE;
+        Status = accountStatus ?? AccountStatus.ACTIVE;
         ProfilePicture = profilePicture;
         CreatedAt = DateTime.Now;
         UpdatedAt = DateTime.Now;

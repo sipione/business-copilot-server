@@ -3,6 +3,7 @@ using APP.Exceptions;
 using APP.Interfaces.Repository;
 using APP.Interfaces.Services;
 
+namespace APP.UseCases;
 public class GetAllUsersUseCase{
 
     private readonly IUserRepository _userRepository;

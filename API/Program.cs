@@ -4,6 +4,7 @@ using APP.Entities;
 using APP.Interfaces.Repository;
 using APP.Interfaces.Services;
 using APP.Services;
+using APP.UseCases;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +32,10 @@ builder.Services.AddScoped<ISubAccountRepository, SubAccountRepository>();
 builder.Services.AddSingleton<ICryptographyServices, CryptographyServices>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IUserAuthorizationService, UserAuthorizationService>();
+
+//Usecases
+builder.Services.AddScoped<GetAllUsersUseCase>();
+builder.Services.AddScoped<GetUserByIdUseCase>();
 
 var app = builder.Build();
 

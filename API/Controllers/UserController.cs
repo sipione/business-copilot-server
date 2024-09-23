@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using APP.Interfaces.Repository;
 using APP.Interfaces.Services;
 using APP.Entities;
 using APP.Exceptions;
+using APP.UseCases;
 
 namespace API.Controllers;
 
@@ -11,19 +11,35 @@ namespace API.Controllers;
 
 public class UserController : ControllerBase{
     private readonly ILogger<UserController> _logger;
-    private readonly IUserRepository _userRepository;
-    private readonly IAuthenticationService _authenticationService;
     private readonly ICryptographyServices _cryptographyServices;
-    private readonly IUserAuthorizationService _userAuthorizationService;
     private readonly GetAllUsersUseCase _getAllUsersUseCase;
+    private readonly GetUserByIdUseCase _getUserByIdUseCase;
+    private readonly CreateUserUseCase _createUserUseCase;
+    private readonly UpdateUserUseCase _updateUserUseCase;
+    private readonly DeleteUserUseCase _deleteUserUseCase;
+    private readonly RegisterUserUseCase _registerUserUseCase;
+    private readonly LoginUserUseCase _loginUserUseCase;
 
-    public UserController(ILogger<UserController> logger, IUserRepository userRepository, IAuthenticationService authenticationService, ICryptographyServices cryptographyServices, IUserAuthorizationService userAuthorizationService, GetAllUsersUseCase getAllUsersUseCase){
+    public UserController(
+        ILogger<UserController> logger,
+        ICryptographyServices cryptographyServices,
+        GetAllUsersUseCase getAllUsersUseCase,
+        GetUserByIdUseCase getUserByIdUseCase,
+        CreateUserUseCase createUserUseCase,
+        UpdateUserUseCase updateUserUseCase,
+        DeleteUserUseCase deleteUserUseCase,
+        RegisterUserUseCase registerUserUseCase,
+        LoginUserUseCase loginUserUseCase
+    ){
         _logger = logger;
-        _userRepository = userRepository;
-        _authenticationService = authenticationService;
         _cryptographyServices = cryptographyServices;
-        _userAuthorizationService = userAuthorizationService;
         _getAllUsersUseCase = getAllUsersUseCase;
+        _getUserByIdUseCase = getUserByIdUseCase;
+        _createUserUseCase = createUserUseCase;
+        _updateUserUseCase = updateUserUseCase;
+        _deleteUserUseCase = deleteUserUseCase;
+        _registerUserUseCase = registerUserUseCase;
+        _loginUserUseCase = loginUserUseCase;
     }
 
     [HttpGet(Name = "GetUsers")]
@@ -43,55 +59,26 @@ public class UserController : ControllerBase{
 
     [HttpGet("{userId}", Name = "GetUser")]
     public async Task<IActionResult> Get([FromRoute]Guid userId, [FromHeader] string token, [FromHeader] Guid requestUserId){
-        User userAuthenticated = await _authenticationService.Authenticate(requestUserId, token);
-
-        if(userAuthenticated == null){
-            return StatusCode(401, "Unauthorized");
-        }
-
-        if((userAuthenticated.Id == userId && !_userAuthorizationService.AuthorizeViewUsers(userAuthenticated, userId)) || (userAuthenticated.Id != userId && !_userAuthorizationService.AuthorizeViewUsers(userAuthenticated, null))){
-            return StatusCode(403, "Forbidden");
-        }
         try{
-            User user = await _userRepository.GetById(userId);
-            if(user == null){
-                return StatusCode(404, "User not found");
-            }
+            User user = await _getUserByIdUseCase.Execute(userId, requestUserId, token);
             return StatusCode(200, user);
         }catch(Exception e){
             _logger.LogError(e.Message);
+            if (e is CommonExceptions commonException)
+            {
+                return StatusCode(commonException.StatusCode, commonException.Message);
+            }
             return StatusCode(500, e.Message);
         }
     }
 
     [HttpPost(Name = "CreateUser")]
-    public async Task<IActionResult> Create([FromForm] CreateUserDto dto, [FromHeader] string token, [FromHeader] Guid userId)
-    {
-        try
-        {
-            // Authenticate and authorize user
-            User user = await _authenticationService.Authenticate(userId, token);
-            if (user == null)
-            {
-                return StatusCode(401, "Unauthorized");
-            }
-
-            if (!_userAuthorizationService.AuthorizeCreateUsers(user))
-            {
-                return StatusCode(403, "Forbidden");
-            }
-
-            // Check if user exists
-            User userExists = await _userRepository.GetByEmail(dto.Email);
-            if (userExists != null)
-            {
-                return StatusCode(409, "Email already exists");
-            }
-
+    public async Task<IActionResult> Create([FromForm] CreateUserDto dto, [FromHeader] string token, [FromHeader] Guid userId){
+        User newUser;
+        try{
             // Handle Profile Picture upload
             string? profilePicturePath = null;
-            if (dto.ProfilePicture != null)
-            {
+            if (dto.ProfilePicture != null){
                 // Save profile picture logic
                 var uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "profile_pictures");
                 if (!Directory.Exists(uploadsDir))
@@ -111,143 +98,36 @@ public class UserController : ControllerBase{
                 profilePicturePath = $"/profile_pictures/{uniqueFileName}";
             }
 
-            // Create new user with profile picture path
-            User newUser = new User
-            {
-                Name = dto.Name,
-                Email = dto.Email,
-                Password = _cryptographyServices.Encrypt(dto.Password),
-                Role = dto.Role,
-                Status = dto.Status ?? AccountStatus.ACTIVE,
-                ProfilePicture = profilePicturePath,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now
-            };
-
-            newUser.AllowPermitionsByRole();
-
-            await _userRepository.Create(newUser);
-
-            return Ok(new
-            {
-                newUser.Id,
-                newUser.Name,
-                newUser.Email,
-                newUser.ProfilePicture, // The relative URL to the profile picture
-                newUser.Role,
-                newUser.Status,
-                newUser.CreatedAt,
-                newUser.UpdatedAt
-            });
-        }
-        catch (Exception e)
-        {
+            newUser = new User(
+                dto.Name,
+                dto.Email,
+                _cryptographyServices.Encrypt(dto.Password),
+                dto.Role,
+                profilePicturePath,
+                dto.Status
+            );
+        }catch(Exception e){
             _logger.LogError(e.Message);
+            return StatusCode(500, $"Error on create new User: {e.Message}");
+        }
+
+        try{
+            Guid newUserId = await _createUserUseCase.Execute(userId, token, newUser);
+            return StatusCode(201, new { userId = newUserId, message= "User created" });
+
+        }catch(Exception e){
+            _logger.LogError(e.Message);
+            if (e is CommonExceptions commonException)
+            {
+                return StatusCode(commonException.StatusCode, commonException.Message);
+            }
             return StatusCode(500, e.Message);
         }
     }
 
     [HttpPost("register", Name = "Register")]
     public async Task<IActionResult> Register([FromForm] CreateUserDto dto){
-        try{
-            User userExists = await _userRepository.GetByEmail(dto.Email);
-
-            if(userExists != null){
-                return StatusCode(409, "Email already exists");
-            }
-
-            User user = new User
-            {
-                Name = dto.Name,
-                Email = dto.Email,
-                Password = _cryptographyServices.Encrypt(dto.Password),
-                Role = UserRole.ORDINARY,
-                Status = AccountStatus.ACTIVE,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now
-            };
-
-            user.AllowPermitionsByRole();
-
-            await _userRepository.Create(user);
-
-            return StatusCode(201, "User created");
-        }catch(Exception e){
-            _logger.LogError(e.Message);
-            return StatusCode(500, e.Message);
-        }
-    }
-
-    [HttpPost("login", Name = "Login")]
-    public async Task<IActionResult> Login([FromForm] LoginDto dto){
-        try{
-            User? user = await _authenticationService.Login(dto.Email, dto.Password);
-            if(user == null){
-                return StatusCode(404, "email or password incorrect");
-            }
-            string token = _cryptographyServices.GenerateToken(user.Id, user.Email);
-            return StatusCode(200, new { token, userId = user.Id, email = user.Email });
-        }catch(Exception e){
-            _logger.LogError(e.Message);
-            return StatusCode(500, e.Message);
-        }
-    }
-
-    [HttpPut("{userId}", Name = "UpdateUser")]
-    public async Task<IActionResult> Update([FromRoute] Guid userId, [FromForm] UpdateUserDto dto, [FromHeader] string token, [FromHeader] Guid userRequestId){
-
-        User userAuthenticated = await _authenticationService.Authenticate(userRequestId, token);
-
-        if(userAuthenticated == null){
-            return StatusCode(401, "Unauthorized");
-        }
-
-        if(userAuthenticated.Id == userId && !_userAuthorizationService.AuthorizeUpdateUsers(userAuthenticated, userId)){
-            return StatusCode(403, "Forbidden");
-        }else if(!_userAuthorizationService.AuthorizeUpdateUsers(userAuthenticated, null)){
-            return StatusCode(403, "Forbidden");
-        }
-
-        User user;
-        try{
-            user = await _userRepository.GetById(userId);
-
-            if (user == null)
-            {
-                return StatusCode(404, "User not found");
-            }
-
-        }catch(Exception e){
-            _logger.LogError(e.Message);
-            return StatusCode(500, e.Message);
-        }
-        
-
-        if (dto.Name != null)
-        {
-            user.Name = dto.Name;
-        }
-
-        if (dto.Email != null)
-        {
-            User userExists = await _userRepository.GetByEmail(dto.Email);
-            if (userExists != null)
-            {
-                return StatusCode(409, "Email already exists");
-            }
-            user.Email = dto.Email;
-        }
-
-        if (dto.Password != null)
-        {
-            user.Password = _cryptographyServices.Encrypt(dto.Password);
-        }
-
-        if (dto.Role != null)
-        {
-            user.Role = (UserRole)dto.Role;
-            user.AllowPermitionsByRole();
-        }
+        string? profilePicturePath = null;
 
         if (dto.ProfilePicture != null){
             // Save profile picture logic
@@ -266,53 +146,115 @@ public class UserController : ControllerBase{
                 await dto.ProfilePicture.CopyToAsync(fileStream);
             }
 
-            user.ProfilePicture = $"/profile_pictures/{uniqueFileName}";
+            profilePicturePath = $"/profile_pictures/{uniqueFileName}";
         }
-            
 
-        user.UpdatedAt = DateTime.Now;
+        User newUser = new User(
+            dto.Name,
+            dto.Email,
+            _cryptographyServices.Encrypt(dto.Password),
+            UserRole.ORDINARY,
+            profilePicturePath,
+            AccountStatus.ACTIVE
+        );
 
-        try
-        {
-            await _userRepository.Update(user);
-        }
-        catch (Exception e)
-        {
+        try{
+            await _registerUserUseCase.Execute(newUser);
+            return StatusCode(201, "User registered");
+
+        }catch(Exception e){
             _logger.LogError(e.Message);
+            if (e is CommonExceptions commonException){
+                return StatusCode(commonException.StatusCode, commonException.Message);
+            }
             return StatusCode(500, e.Message);
         }
+    }
 
-        return StatusCode(204, "User updated");
+    [HttpPost("login", Name = "Login")]
+    public async Task<IActionResult> Login([FromForm] LoginDto dto){
+        try{
+            User user = await _loginUserUseCase.OpenSession(dto.Email, dto.Password);
+            string token = _loginUserUseCase.GenerateToken(user.Id, user.Email);
+            return StatusCode(200, new { accessToken = token, userId = user.Id, userEmail = user.Email, message = "Login successful" });
+        }catch(Exception e){
+            _logger.LogError(e.Message);
+            if (e is CommonExceptions commonException)
+            {
+                return StatusCode(commonException.StatusCode, commonException.Message);
+            }
+            return StatusCode(500, e.Message);
+        }
+    }
+
+    [HttpPut("{userId}", Name = "UpdateUser")]
+    public async Task<IActionResult> Update([FromRoute] Guid userId, [FromForm] UpdateUserDto dto, [FromHeader] string token, [FromHeader] Guid userRequestId){
+        string profilePicturePath = null;
+
+        if (dto.ProfilePicture != null && dto.CurrentProfilePicturePath != null){
+            // Delete old profile picture
+            var currentProfilePicturePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", dto.CurrentProfilePicturePath);
+            if (System.IO.File.Exists(currentProfilePicturePath))
+            {
+                System.IO.File.Delete(currentProfilePicturePath);
+            }
+        }
+
+        if(dto.ProfilePicture != null){
+            // Save profile picture logic
+            var uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "profile_pictures");
+            if (!Directory.Exists(uploadsDir))
+            {
+                Directory.CreateDirectory(uploadsDir);
+            }
+
+            var fileExtension = Path.GetExtension(dto.ProfilePicture.FileName);
+            var uniqueFileName = Guid.NewGuid().ToString() + fileExtension;
+            var filePath = Path.Combine(uploadsDir, uniqueFileName);
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await dto.ProfilePicture.CopyToAsync(fileStream);
+            }
+
+            profilePicturePath = $"/profile_pictures/{uniqueFileName}";
+        }
+
+        User userUpdated = new User(
+            dto.Name,
+            dto.Email,
+            "default",
+            dto.Role,
+            profilePicturePath,
+            dto.Status
+        );
+
+        try{
+            await _updateUserUseCase.Execute(userId, token, userRequestId, userUpdated);
+            return StatusCode(204, "User updated");
+        }
+        catch (Exception e){
+            _logger.LogError(e.Message);
+            if (e is CommonExceptions commonException)
+            {
+                return StatusCode(commonException.StatusCode, commonException.Message);
+            }
+            return StatusCode(500, e.Message);
+        }
     }
 
     [HttpDelete("{userId}", Name = "DeleteUser")]
     public async Task<IActionResult> Delete([FromRoute] Guid userId, [FromHeader] string token, [FromHeader] Guid requestedId){
-        User userAuthenticated = await _authenticationService.Authenticate(requestedId, token);
-
-        if(userAuthenticated == null){
-            return StatusCode(401, "Unauthorized");
-        }
-
-        if((userAuthenticated.Id == userId && !_userAuthorizationService.AuthorizeDeleteUsers(userAuthenticated, userId)) || (userAuthenticated.Id != userId && !_userAuthorizationService.AuthorizeDeleteUsers(userAuthenticated, null))){
-            return StatusCode(403, "Forbidden");
-        }
-
         try{
-            User user = await _userRepository.GetById(userId);
-            if(user == null){
-                return StatusCode(404, "User not found");
-            }
-
-        }catch(Exception e){
-            _logger.LogError(e.Message);
-            return StatusCode(500, e.Message);
-        }
-
-        try{
-            await _userRepository.Delete(userId);
+            await _deleteUserUseCase.Execute(userId, token, requestedId);
             return StatusCode(204, "User deleted");
+
         }catch(Exception e){
             _logger.LogError(e.Message);
+            if (e is CommonExceptions commonException)
+            {
+                return StatusCode(commonException.StatusCode, commonException.Message);
+            }
             return StatusCode(500, e.Message);
         }
     }
