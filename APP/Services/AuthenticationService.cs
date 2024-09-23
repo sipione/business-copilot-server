@@ -15,15 +15,15 @@ public class AuthenticationService : IAuthenticationService{
         _cryptographyServices = cryptographyServices;
     }
 
-    public async Task<User?> Authenticate(string email, Guid userId, string token)
+    public async Task<User?> Authenticate(Guid userId, string token)
     {
-        User user = await _userRepository.GetByEmail(email);
+        User user = await _userRepository.GetById(userId);
         if (user == null)
         {
             return null;
         }
 
-        if (!_cryptographyServices.ValidateToken(token, userId, email))
+        if (!_cryptographyServices.ValidateToken(token, userId, user.Email))
         {
             return null;
         }

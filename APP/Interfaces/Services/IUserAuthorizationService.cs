@@ -1,4 +1,6 @@
 using APP.Entities;
+
+namespace APP.Interfaces.Services;
 public interface IUserAuthorizationService{
     bool AuthorizeViewUsers(User user, Guid? userId);
     bool AuthorizeCreateUsers(User user);

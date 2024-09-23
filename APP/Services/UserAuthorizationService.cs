@@ -1,5 +1,6 @@
 using APP.Entities;
 using APP.Enums;
+using APP.Interfaces.Services;
 
 namespace APP.Services;
 public class UserAuthorizationService : IUserAuthorizationService{

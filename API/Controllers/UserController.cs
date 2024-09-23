@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using APP.Interfaces.Repository;
 using APP.Interfaces.Services;
 using APP.Entities;
+using APP.Exceptions;
+
 namespace API.Controllers;
 
 [ApiController]
@@ -13,39 +15,35 @@ public class UserController : ControllerBase{
     private readonly IAuthenticationService _authenticationService;
     private readonly ICryptographyServices _cryptographyServices;
     private readonly IUserAuthorizationService _userAuthorizationService;
+    private readonly GetAllUsersUseCase _getAllUsersUseCase;
 
-    public UserController(ILogger<UserController> logger, IUserRepository userRepository, IAuthenticationService authenticationService, ICryptographyServices cryptographyServices, IUserAuthorizationService userAuthorizationService)
-    {
+    public UserController(ILogger<UserController> logger, IUserRepository userRepository, IAuthenticationService authenticationService, ICryptographyServices cryptographyServices, IUserAuthorizationService userAuthorizationService, GetAllUsersUseCase getAllUsersUseCase){
         _logger = logger;
         _userRepository = userRepository;
         _authenticationService = authenticationService;
         _cryptographyServices = cryptographyServices;
         _userAuthorizationService = userAuthorizationService;
+        _getAllUsersUseCase = getAllUsersUseCase;
     }
 
     [HttpGet(Name = "GetUsers")]
-    public async Task<IActionResult> Get([FromHeader] string token, [FromHeader] string email, [FromHeader] Guid userId){
+    public async Task<IActionResult> Get([FromHeader] string token, [FromHeader] Guid userId){
         try{
-            User user = await _authenticationService.Authenticate(email, userId, token);
-            if(user == null){
-                return StatusCode(401, "Unauthorized");
-            }
-
-            if(!_userAuthorizationService.AuthorizeViewUsers(user, null)){
-                return StatusCode(403, "Forbidden");
-            }
-
-            IEnumerable<User> users = await _userRepository.GetAll();
+            IEnumerable<User> users = await _getAllUsersUseCase.Execute(userId, token);
             return StatusCode(200, users);
         }catch(Exception e){
             _logger.LogError(e.Message);
+            if (e is CommonExceptions commonException)
+            {
+                return StatusCode(commonException.StatusCode, commonException.Message);
+            }
             return StatusCode(500, e.Message);
         }
     }
 
     [HttpGet("{userId}", Name = "GetUser")]
-    public async Task<IActionResult> Get([FromRoute]Guid userId, [FromHeader] string token, [FromHeader] string email, [FromHeader] Guid requestUserId){
-        User userAuthenticated = await _authenticationService.Authenticate(email, requestUserId, token);
+    public async Task<IActionResult> Get([FromRoute]Guid userId, [FromHeader] string token, [FromHeader] Guid requestUserId){
+        User userAuthenticated = await _authenticationService.Authenticate(requestUserId, token);
 
         if(userAuthenticated == null){
             return StatusCode(401, "Unauthorized");
@@ -67,12 +65,12 @@ public class UserController : ControllerBase{
     }
 
     [HttpPost(Name = "CreateUser")]
-    public async Task<IActionResult> Create([FromForm] CreateUserDto dto, [FromHeader] string token, [FromHeader] string email, [FromHeader] Guid userId)
+    public async Task<IActionResult> Create([FromForm] CreateUserDto dto, [FromHeader] string token, [FromHeader] Guid userId)
     {
         try
         {
             // Authenticate and authorize user
-            User user = await _authenticationService.Authenticate(email, userId, token);
+            User user = await _authenticationService.Authenticate(userId, token);
             if (user == null)
             {
                 return StatusCode(401, "Unauthorized");
@@ -149,7 +147,6 @@ public class UserController : ControllerBase{
         }
     }
 
-
     [HttpPost("register", Name = "Register")]
     public async Task<IActionResult> Register([FromForm] CreateUserDto dto){
         try{
@@ -197,9 +194,9 @@ public class UserController : ControllerBase{
     }
 
     [HttpPut("{userId}", Name = "UpdateUser")]
-    public async Task<IActionResult> Update([FromRoute] Guid userId, [FromForm] UpdateUserDto dto, [FromHeader] string token, [FromHeader] string email, [FromHeader] Guid userRequestId){
+    public async Task<IActionResult> Update([FromRoute] Guid userId, [FromForm] UpdateUserDto dto, [FromHeader] string token, [FromHeader] Guid userRequestId){
 
-        User userAuthenticated = await _authenticationService.Authenticate(email, userRequestId, token);
+        User userAuthenticated = await _authenticationService.Authenticate(userRequestId, token);
 
         if(userAuthenticated == null){
             return StatusCode(401, "Unauthorized");
@@ -289,8 +286,8 @@ public class UserController : ControllerBase{
     }
 
     [HttpDelete("{userId}", Name = "DeleteUser")]
-    public async Task<IActionResult> Delete([FromRoute] Guid userId, [FromHeader] string token, [FromHeader] string email, [FromHeader] Guid requestedId){
-        User userAuthenticated = await _authenticationService.Authenticate(email, requestedId, token);
+    public async Task<IActionResult> Delete([FromRoute] Guid userId, [FromHeader] string token, [FromHeader] Guid requestedId){
+        User userAuthenticated = await _authenticationService.Authenticate(requestedId, token);
 
         if(userAuthenticated == null){
             return StatusCode(401, "Unauthorized");
