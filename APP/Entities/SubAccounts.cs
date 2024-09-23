@@ -1,6 +1,6 @@
+using APP.Enums;
 namespace APP.Entities;
-public class SubAccounts
-{
+public class SubAccounts{
     public Guid Id { get; set; }
     public Guid UserId { get; set; }
     public Guid StakeholderId { get; set; }
@@ -15,8 +15,7 @@ public class SubAccounts
     public List<Progress> Progresses { get; set; }
     public List<Permitions> PermitionsList { get; set; }
 
-    public SubAccounts(Guid userId, Guid stakeholderId, string name, string? description, string email, string password, SubAccountRole role)
-    {
+    public SubAccounts(Guid userId, Guid stakeholderId, string name, string? description, string email, string password, SubAccountRole role){
         Id = Guid.NewGuid();
         UserId = userId;
         StakeholderId = stakeholderId;

@@ -1,5 +1,6 @@
-public enum Permitions
-{
+namespace APP.Enums;
+
+public enum Permitions{
     READ_USERS,
     CREATE_USERS,
     UPDATE_USERS,

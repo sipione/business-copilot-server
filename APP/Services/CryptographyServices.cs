@@ -18,13 +18,12 @@ public class CryptographyServices : ICryptographyServices
         return Encrypt(text) == cryptography;
     }
 
-    public string GenerateToken(User user)
+    public string GenerateToken(Guid userId, string email)
     {
-        return Encrypt(user.Email + user.Password);
+        return Encrypt(email + ";" + userId);
     }
 
-    public bool ValidateToken(string token, User user)
-    {
-        return GenerateToken(user) == token;
+    public bool ValidateToken(string token, Guid userId, string email){
+        return token == GenerateToken(userId, email);
     }
 }

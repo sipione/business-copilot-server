@@ -4,7 +4,7 @@ public class UpdateUserDto
     public string? Email { get; set; }
     public string? Password { get; set; }
     public UserRole? Role { get; set; }
-    public string? ProfilePicture { get; set; }
+    public IFormFile? ProfilePicture { get; set; }
 }
 
 public class CreateUserDto
@@ -13,5 +13,12 @@ public class CreateUserDto
     public string Email { get; set; }
     public string Password { get; set; }
     public UserRole Role { get; set; }
-    public string? ProfilePicture { get; set; }
+    public IFormFile? ProfilePicture { get; set; }
+    public AccountStatus? Status { get; set; }
+}
+
+public class LoginDto
+{
+    public string Email { get; set; }
+    public string Password { get; set; }
 }
