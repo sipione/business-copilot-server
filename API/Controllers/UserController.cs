@@ -42,6 +42,34 @@ public class UserController : ControllerBase{
         _loginUserUseCase = loginUserUseCase;
     }
 
+    private string SaveProfilePicture(IFormFile profilePicture){
+        // Save profile picture logic
+        var uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "profile_pictures");
+        if (!Directory.Exists(uploadsDir))
+        {
+            Directory.CreateDirectory(uploadsDir);
+        }
+
+        var fileExtension = Path.GetExtension(profilePicture.FileName);
+        var uniqueFileName = Guid.NewGuid().ToString() + fileExtension;
+        var filePath = Path.Combine(uploadsDir, uniqueFileName);
+
+        using (var fileStream = new FileStream(filePath, FileMode.Create))
+        {
+            profilePicture.CopyTo(fileStream);
+        }
+
+        return $"/profile_pictures/{uniqueFileName}";
+    }
+
+    private void DeleteProfilePicture(string profilePicturePath){
+        var currentProfilePicturePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", profilePicturePath);
+        if (System.IO.File.Exists(currentProfilePicturePath))
+        {
+            System.IO.File.Delete(currentProfilePicturePath);
+        }
+    }
+
     [HttpGet(Name = "GetUsers")]
     public async Task<IActionResult> Get([FromHeader] string token, [FromHeader] Guid userId){
         try{
@@ -79,23 +107,7 @@ public class UserController : ControllerBase{
             // Handle Profile Picture upload
             string? profilePicturePath = null;
             if (dto.ProfilePicture != null){
-                // Save profile picture logic
-                var uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "profile_pictures");
-                if (!Directory.Exists(uploadsDir))
-                {
-                    Directory.CreateDirectory(uploadsDir);
-                }
-
-                var fileExtension = Path.GetExtension(dto.ProfilePicture.FileName);
-                var uniqueFileName = Guid.NewGuid().ToString() + fileExtension;
-                var filePath = Path.Combine(uploadsDir, uniqueFileName);
-
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    await dto.ProfilePicture.CopyToAsync(fileStream);
-                }
-
-                profilePicturePath = $"/profile_pictures/{uniqueFileName}";
+                profilePicturePath = SaveProfilePicture(dto.ProfilePicture);
             }
 
             newUser = new User(
@@ -128,25 +140,8 @@ public class UserController : ControllerBase{
     [HttpPost("register", Name = "Register")]
     public async Task<IActionResult> Register([FromForm] CreateUserDto dto){
         string? profilePicturePath = null;
-
         if (dto.ProfilePicture != null){
-            // Save profile picture logic
-            var uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "profile_pictures");
-            if (!Directory.Exists(uploadsDir))
-            {
-                Directory.CreateDirectory(uploadsDir);
-            }
-
-            var fileExtension = Path.GetExtension(dto.ProfilePicture.FileName);
-            var uniqueFileName = Guid.NewGuid().ToString() + fileExtension;
-            var filePath = Path.Combine(uploadsDir, uniqueFileName);
-
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
-            {
-                await dto.ProfilePicture.CopyToAsync(fileStream);
-            }
-
-            profilePicturePath = $"/profile_pictures/{uniqueFileName}";
+            profilePicturePath = SaveProfilePicture(dto.ProfilePicture);
         }
 
         User newUser = new User(
@@ -191,33 +186,12 @@ public class UserController : ControllerBase{
     public async Task<IActionResult> Update([FromRoute] Guid userId, [FromForm] UpdateUserDto dto, [FromHeader] string token, [FromHeader] Guid userRequestId){
         string profilePicturePath = null;
 
-        if (dto.ProfilePicture != null && dto.CurrentProfilePicturePath != null){
-            // Delete old profile picture
-            var currentProfilePicturePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", dto.CurrentProfilePicturePath);
-            if (System.IO.File.Exists(currentProfilePicturePath))
-            {
-                System.IO.File.Delete(currentProfilePicturePath);
-            }
+        if (dto.ProfilePicture != null){
+            profilePicturePath = SaveProfilePicture(dto.ProfilePicture);
         }
 
-        if(dto.ProfilePicture != null){
-            // Save profile picture logic
-            var uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "profile_pictures");
-            if (!Directory.Exists(uploadsDir))
-            {
-                Directory.CreateDirectory(uploadsDir);
-            }
-
-            var fileExtension = Path.GetExtension(dto.ProfilePicture.FileName);
-            var uniqueFileName = Guid.NewGuid().ToString() + fileExtension;
-            var filePath = Path.Combine(uploadsDir, uniqueFileName);
-
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
-            {
-                await dto.ProfilePicture.CopyToAsync(fileStream);
-            }
-
-            profilePicturePath = $"/profile_pictures/{uniqueFileName}";
+        if ((dto.CurrentProfilePicturePath != null && dto.ProfilePicture == null) || (dto.ProfilePicture != null && dto.CurrentProfilePicturePath != null)){
+            profilePicturePath = dto.CurrentProfilePicturePath;
         }
 
         User userUpdated = new User(
@@ -246,7 +220,8 @@ public class UserController : ControllerBase{
     [HttpDelete("{userId}", Name = "DeleteUser")]
     public async Task<IActionResult> Delete([FromRoute] Guid userId, [FromHeader] string token, [FromHeader] Guid requestedId){
         try{
-            await _deleteUserUseCase.Execute(userId, token, requestedId);
+            await _deleteUserUseCase.Execute(userId, token, requestedId, DeleteProfilePicture);
+            
             return StatusCode(204, "User deleted");
 
         }catch(Exception e){

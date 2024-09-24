@@ -17,7 +17,7 @@ public class DeleteUserUseCase{
         _userAuthorizationService = userAuthorizationService;
     }
 
-    public async Task Execute(Guid userId, string token, Guid requestedId){
+    public async Task Execute(Guid userId, string token, Guid requestedId, Action<string> DeleteProfilePicture){
         User userAuthenticated = await _authenticationService.Authenticate(requestedId, token);
 
         if(userAuthenticated == null){
@@ -31,6 +31,10 @@ public class DeleteUserUseCase{
         User user = await _userRepository.GetById(userId);
         if(user == null){
             throw CommonExceptions.NotFound("User not found");
+        }
+
+        if(user.ProfilePicture != null){
+            DeleteProfilePicture(user.ProfilePicture);
         }
 
         await _userRepository.Delete(userId);
