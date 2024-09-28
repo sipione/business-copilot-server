@@ -9,5 +9,5 @@ public interface IStakeholderRepository
     Task<Stakeholder> GetByEmail(string email);
     Task<Stakeholder> Create(Stakeholder stakeholder);
     Task<Stakeholder> Update(Stakeholder stakeholder);
-    Task<Stakeholder> Delete(Guid id);
+    Task<bool?> Delete(Guid id);
 }

@@ -51,7 +51,7 @@ public class StakeholderRepository : IStakeholderRepository
         return stakeholder;
     }
 
-    public async Task<Stakeholder> Delete(Guid id)
+    public async Task<bool?> Delete(Guid id)
     {
         var stakeholder = await _context.Stakeholders.FindAsync(id);
         if (stakeholder == null)
@@ -61,6 +61,6 @@ public class StakeholderRepository : IStakeholderRepository
 
         _context.Stakeholders.Remove(stakeholder);
         await _context.SaveChangesAsync();
-        return stakeholder;
+        return true;
     }
 }

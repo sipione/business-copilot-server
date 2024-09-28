@@ -36,6 +36,16 @@ builder.Services.AddScoped<IUserAuthorizationService, UserAuthorizationService>(
 //Usecases
 builder.Services.AddScoped<GetAllUsersUseCase>();
 builder.Services.AddScoped<GetUserByIdUseCase>();
+builder.Services.AddScoped<CreateUserUseCase>();
+builder.Services.AddScoped<UpdateUserUseCase>();
+builder.Services.AddScoped<DeleteUserUseCase>();
+builder.Services.AddScoped<RegisterUserUseCase>();
+builder.Services.AddScoped<LoginUserUseCase>();
+builder.Services.AddScoped<GetAllStakeholdersUsecase>();
+builder.Services.AddScoped<GetStakeholderByIdUseCase>();
+builder.Services.AddScoped<CreateStakeholderUseCase>();
+builder.Services.AddScoped<UpdateStakeholderUseCase>();
+builder.Services.AddScoped<DeleteStakeholderUseCase>();
 
 var app = builder.Build();
 

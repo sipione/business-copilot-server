@@ -1,96 +1,112 @@
 using Microsoft.AspNetCore.Mvc;
-using APP.Interfaces.Repository;
 using APP.Entities;
+using APP.UseCases;
+using APP.Exceptions;
 namespace API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-
 public class StakeholderController : ControllerBase{
     private readonly ILogger<StakeholderController> _logger;
-    private readonly IStakeholderRepository _stakeholderRepository;
+    private readonly GetAllStakeholdersUsecase _getAllStakeholdersUsecase;
+    private readonly GetStakeholderByIdUseCase _getAllStakeholderByIdUseCase;
+    private readonly DeleteStakeholderUseCase _deleteStakeholderUseCase;
+    private readonly CreateStakeholderUseCase _createStakeholderUseCase;
+    private readonly UpdateStakeholderUseCase _updateStakeholderUseCase;
 
-    public StakeholderController(ILogger<StakeholderController> logger, IStakeholderRepository stakeholderRepository)
-    {
+    public StakeholderController(ILogger<StakeholderController> logger, GetAllStakeholdersUsecase getAllStakeholdersUsecase, GetStakeholderByIdUseCase getAllStakeholderByIdUseCase, DeleteStakeholderUseCase deleteStakeholderUseCase, CreateStakeholderUseCase createStakeholderUseCase, UpdateStakeholderUseCase updateStakeholderUseCase){
         _logger = logger;
-        _stakeholderRepository = stakeholderRepository;
+        _getAllStakeholdersUsecase = getAllStakeholdersUsecase;
+        _getAllStakeholderByIdUseCase = getAllStakeholderByIdUseCase;
+        _deleteStakeholderUseCase = deleteStakeholderUseCase;
+        _createStakeholderUseCase = createStakeholderUseCase;
+        _updateStakeholderUseCase = updateStakeholderUseCase;
     }
 
     [HttpGet(Name = "GetStakeholders")]
-    public async Task<IActionResult> Get()
-    {
+    public async Task<IActionResult> Get([FromHeader] Guid userId, [FromHeader] string token){
         try{
-            var stakeholders = await _stakeholderRepository.GetAll();
+            IEnumerable<Stakeholder> stakeholders = await _getAllStakeholdersUsecase.Execute(userId, token);
             return StatusCode(200, stakeholders);
         }catch(Exception e){
+            _logger.LogError(e.Message);
+            if(e is CommonExceptions commonExceptions){
+                return StatusCode(commonExceptions.StatusCode, commonExceptions.Message);
+            }
             return StatusCode(500, e.Message);
         }
     }
 
     [HttpGet("{id}", Name = "GetStakeholder")]
-    public async Task<IActionResult> Get(Guid id)
-    {
+    public async Task<IActionResult> Get([FromRoute] Guid id, [FromHeader] Guid userId, [FromHeader] string token){
         try{
-            var stakeholder = await _stakeholderRepository.GetById(id);
+            Stakeholder stakeholder = await _getAllStakeholderByIdUseCase.Execute(userId, token, id);
             return StatusCode(200, stakeholder);
         }catch(Exception e){
+            _logger.LogError(e.Message);
+            if(e is CommonExceptions commonExceptions){
+                return StatusCode(commonExceptions.StatusCode, commonExceptions.Message);
+            }
             return StatusCode(500, e.Message);
         }
     }
+    
 
     [HttpPost(Name = "CreateStakeholder")]
-    public async Task<IActionResult> Create(CreateStakeholderDto stakeholderDto)
-    {
+    public async Task<IActionResult> Create([FromForm] CreateStakeholderDto stakeholderDto, [FromForm] Guid userId, [FromForm] string token){
         try{
-            Stakeholder stakeholderExist = await _stakeholderRepository.GetByEmail(stakeholderDto.Email);
-            if(stakeholderExist != null){
-                return StatusCode(400, "Stakeholder already exists");
-            }
-            var stakeholder = new Stakeholder(stakeholderDto.UserId, stakeholderDto.Name, stakeholderDto.Email, stakeholderDto.Phone, stakeholderDto.Address, stakeholderDto.City, stakeholderDto.State, stakeholderDto.Country, stakeholderDto.ZipCode, stakeholderDto.Type, stakeholderDto.Status);
-            var createdStakeholder = await _stakeholderRepository.Create(stakeholder);
+            Stakeholder stakeholder = new Stakeholder(
+                userId, 
+                stakeholderDto.Name, 
+                stakeholderDto.Email, 
+                stakeholderDto.Phone, 
+                stakeholderDto.Address, 
+                stakeholderDto.City, 
+                stakeholderDto.State, 
+                stakeholderDto.Country, 
+                stakeholderDto.ZipCode, 
+                stakeholderDto.Type, 
+                stakeholderDto.Status
+            );
+
+            Stakeholder createdStakeholder = await _createStakeholderUseCase.Execute(userId, token, stakeholder);
             return StatusCode(201, createdStakeholder);
         }catch(Exception e){
+            _logger.LogError(e.Message);
+            if(e is CommonExceptions commonExceptions){
+                return StatusCode(commonExceptions.StatusCode, commonExceptions.Message);
+            }
             return StatusCode(500, e.Message);
         }
     }
 
     [HttpPut(Name = "UpdateStakeholder")]
-    public async Task<IActionResult> Update(UpdateStakeholderDto stakeholderDto)
-    {
+    public async Task<IActionResult> Update([FromForm] UpdateStakeholderDto stakeholderDto, [FromForm] Guid userId, [FromForm] string token){
         try{
-            var stakeholder = await _stakeholderRepository.GetById(stakeholderDto.Id);
-            if(stakeholder == null){
-                return StatusCode(404, "Stakeholder not found");
-            }
-            
-            stakeholder.Name = stakeholderDto.Name ?? stakeholder.Name;
-            stakeholder.Email = stakeholderDto.Email ?? stakeholder.Email;
-            stakeholder.Phone = stakeholderDto.Phone ?? stakeholder.Phone;
-            stakeholder.Address = stakeholderDto.Address ?? stakeholder.Address;
-            stakeholder.City = stakeholderDto.City ?? stakeholder.City;
-            stakeholder.State = stakeholderDto.State ?? stakeholder.State;
-            stakeholder.Country = stakeholderDto.Country ?? stakeholder.Country;
-            stakeholder.ZipCode = stakeholderDto.ZipCode ?? stakeholder.ZipCode;
-            stakeholder.Type = stakeholderDto.Type ?? stakeholder.Type;
-            stakeholder.Status = stakeholderDto.Status ?? stakeholder.Status;
+            Stakeholder newStakeholder = new Stakeholder(userId, stakeholderDto.Name, stakeholderDto.Email, stakeholderDto.Phone, stakeholderDto.Address, stakeholderDto.City, stakeholderDto.State, stakeholderDto.Country, stakeholderDto.ZipCode, stakeholderDto.Type, stakeholderDto.Status);
 
-            var updatedStakeholder = await _stakeholderRepository.Update(stakeholder);
+            Stakeholder updatedStakeholder = await _updateStakeholderUseCase.Execute(userId, token, newStakeholder, stakeholderDto.Id);
+
             return StatusCode(200, updatedStakeholder);
         }catch(Exception e){
+            _logger.LogError(e.Message);
+            if(e is CommonExceptions commonExceptions){
+                return StatusCode(commonExceptions.StatusCode, commonExceptions.Message);
+            }
             return StatusCode(500, e.Message);
         }
     }
 
     [HttpDelete("{id}", Name = "DeleteStakeholder")]
-    public async Task<IActionResult> Delete(Guid id)
-    {
+    public async Task<IActionResult> Delete([FromRoute] Guid id, [FromForm] Guid userId, [FromForm] string token){
         try{
-            var stakeholder = await _stakeholderRepository.Delete(id);
-            if(stakeholder == null){
-                return StatusCode(404, "Stakeholder not found");
-            }
-            return StatusCode(200, stakeholder);
+            await _deleteStakeholderUseCase.Execute(userId, token, id);
+            return StatusCode(204);
         }catch(Exception e){
+            _logger.LogError(e.Message);
+            if(e is CommonExceptions commonExceptions){
+                return StatusCode(commonExceptions.StatusCode, commonExceptions.Message);
+            }
             return StatusCode(500, e.Message);
         }
     }
