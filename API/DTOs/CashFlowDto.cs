@@ -2,8 +2,7 @@ using APP.Entities;
 
 public class CreateIncomeCashFlowDto{
     public Guid? ContractId { get; set; }
-    public Guid UserId { get; set; }
-    public string Description { get; set; }
+    public required string Description { get; set; }
     public float Amount { get; set; }
     public DateTime TransactionDate { get; set; }
     public PaymentStatus Status { get; set; }
@@ -13,11 +12,11 @@ public class CreateIncomeCashFlowDto{
 public class UpdateIncomeCashFlowDto{
     public Guid Id { get; set; }
     public Guid? ContractId { get; set; }
-    public string? Description { get; set; }
-    public float? Amount { get; set; }
-    public DateTime? TransactionDate { get; set; }
-    public PaymentStatus? Status { get; set; }
-    public IncomeCategory? Category { get; set; }
+    public required string Description { get; set; }
+    public float Amount { get; set; }
+    public DateTime TransactionDate { get; set; }
+    public PaymentStatus Status { get; set; }
+    public IncomeCategory Category { get; set; } 
 }
 
 public class CreateExpenseCashFlowDto{

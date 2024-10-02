@@ -15,12 +15,12 @@ public class CashFlowRepository : ICashFlowRepository{
         IEnumerable<ExpenseCashFlow> cashFlows = await _context.ExpenseCashFlows.ToListAsync();
         return cashFlows;
     }
-    public async Task<IncomeCashFlow> GetIncomeCashFlowById(Guid id){
-        IncomeCashFlow cashFlow = await _context.IncomeCashFlows.FindAsync(id);
+    public async Task<IncomeCashFlow?> GetIncomeCashFlowById(Guid id){
+        IncomeCashFlow? cashFlow = await _context.IncomeCashFlows.FindAsync(id);
         return cashFlow;
     }
-    public async Task<ExpenseCashFlow> GetExpenseCashFlowById(Guid id){
-        ExpenseCashFlow cashFlow = await _context.ExpenseCashFlows.FindAsync(id);
+    public async Task<ExpenseCashFlow?> GetExpenseCashFlowById(Guid id){
+        ExpenseCashFlow? cashFlow = await _context.ExpenseCashFlows.FindAsync(id);
         return cashFlow;
     }
     public async Task<IncomeCashFlow> CreateIncomeCashFlow(IncomeCashFlow cashFlow){
@@ -43,22 +43,22 @@ public class CashFlowRepository : ICashFlowRepository{
         await _context.SaveChangesAsync();
         return cashFlow;
     }
-    public async Task<IncomeCashFlow> DeleteIncomeCashFlow(Guid id){
+    public async Task<bool> DeleteIncomeCashFlow(Guid id){
         var cashFlow = await _context.IncomeCashFlows.FindAsync(id);
         if(cashFlow == null){
-            throw new Exception("Income Cash Flow not found");
+            return false;
         }
         _context.IncomeCashFlows.Remove(cashFlow);
         await _context.SaveChangesAsync();
-        return cashFlow;
+        return true;
     }
-    public async Task<ExpenseCashFlow> DeleteExpenseCashFlow(Guid id){
+    public async Task<bool> DeleteExpenseCashFlow(Guid id){
         var cashFlow = await _context.ExpenseCashFlows.FindAsync(id);
         if(cashFlow == null){
-            throw new Exception("Expense Cash Flow not found");
+            return false;
         }
         _context.ExpenseCashFlows.Remove(cashFlow);
         await _context.SaveChangesAsync();
-        return cashFlow;
+        return true;
     }
 }

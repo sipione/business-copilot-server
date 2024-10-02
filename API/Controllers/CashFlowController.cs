@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using APP.Interfaces.Repository;
 using APP.Entities;
+using APP.UseCases;
+using APP.Exceptions;
 namespace API.Controllers;
 
 [ApiController]
@@ -8,25 +10,38 @@ namespace API.Controllers;
 public class CashFlowController : ControllerBase{
     private readonly ILogger<CashFlowController> _logger;
     private readonly ICashFlowRepository _cashFlowRepository;
-    private readonly IContractRepository _contractRepository;
+    private readonly GetAllIncomesUseCase _getAllIncomesUseCase;
+    private readonly GetIncomeByIdUseCase _getIncomeByIdUseCase;
+    private readonly CreateIncomeUseCase _createIncomeUseCase;
+    private readonly UpdateIncomeUseCase _updateIncomeUseCase;
+    private readonly DeleteIncomeUseCase _deleteIncomeUseCase;
 
-    public CashFlowController(ILogger<CashFlowController> logger, ICashFlowRepository cashFlowRepository, IContractRepository contractRepository){
+    public CashFlowController(ILogger<CashFlowController> logger, ICashFlowRepository cashFlowRepository, GetAllIncomesUseCase getAllIncomesUseCase, GetIncomeByIdUseCase getIncomeByIdUseCase, CreateIncomeUseCase createIncomeUseCase, UpdateIncomeUseCase updateIncomeUseCase, DeleteIncomeUseCase deleteIncomeUseCase){
         _logger = logger;
         _cashFlowRepository = cashFlowRepository;
-        _contractRepository = contractRepository;
+        _getAllIncomesUseCase = getAllIncomesUseCase;
+        _getIncomeByIdUseCase = getIncomeByIdUseCase;
+        _createIncomeUseCase = createIncomeUseCase;
+        _updateIncomeUseCase = updateIncomeUseCase;
+        _deleteIncomeUseCase = deleteIncomeUseCase;
     }
 
     [HttpGet("income", Name = "GetIncomeCashFlows")]
-    public async Task<IActionResult> GetIncomeCashFlows()
+    public async Task<IActionResult> GetIncomeCashFlows([FromHeader] Guid userId, [FromHeader] string token)
     {
         try{
-            IEnumerable<IncomeCashFlow> cashFlows = await _cashFlowRepository.GetIncomeCashFlows();
+            IEnumerable<IncomeCashFlow> cashFlows = await _getAllIncomesUseCase.Execute(userId, token);
             return StatusCode(200, cashFlows);
         }catch(Exception e){
             _logger.LogError(e.Message);
+            if (e is CommonExceptions commonException)
+            {
+                return StatusCode(commonException.StatusCode, commonException.Message);
+            }
             return StatusCode(500, e.Message);
         }
     }
+
 
     [HttpGet("expense", Name = "GetExpenseCashFlows")]
     public async Task<IActionResult> GetExpenseCashFlows()
@@ -41,16 +56,17 @@ public class CashFlowController : ControllerBase{
     }
 
     [HttpGet("income/{id}", Name = "GetIncomeCashFlowById")]
-    public async Task<IActionResult> GetIncomeCashFlowById(Guid id)
+    public async Task<IActionResult> GetIncomeCashFlowById([FromRoute] Guid id, [FromHeader] Guid userId, [FromHeader] string token)
     {
         try{
-            IncomeCashFlow cashFlow = await _cashFlowRepository.GetIncomeCashFlowById(id);
-            if(cashFlow == null){
-                return StatusCode(404, "Income Cash Flow not found");
-            }
+            IncomeCashFlow cashFlow = await _getIncomeByIdUseCase.Execute(userId, token, id);
             return StatusCode(200, cashFlow);
         }catch(Exception e){
             _logger.LogError(e.Message);
+            if (e is CommonExceptions commonException)
+            {
+                return StatusCode(commonException.StatusCode, commonException.Message);
+            }
             return StatusCode(500, e.Message);
         }
     }
@@ -71,8 +87,15 @@ public class CashFlowController : ControllerBase{
     }
 
     [HttpPost("income", Name = "CreateIncomeCashFlow")]
-    public async Task<IActionResult> CreateIncomeCashFlow([FromBody] CreateIncomeCashFlowDto dto){
-        IncomeCashFlow cashFlow = new IncomeCashFlow(dto.ContractId, dto.UserId, dto.Description, dto.Amount, dto.TransactionDate, dto.Status, dto.Category);
+    public async Task<IActionResult> CreateIncomeCashFlow([FromForm] CreateIncomeCashFlowDto dto, [FromHeader] Guid userId, [FromHeader] string token){
+        IncomeCashFlow cashFlow;
+
+        try{
+            cashFlow = new IncomeCashFlow(dto.ContractId, userId, dto.Description, dto.Amount, dto.TransactionDate, dto.Status, dto.Category);
+        }catch(Exception e){
+            _logger.LogError(e.Message);
+            return StatusCode(500, $"Error creating IncomeCashFlow: {e.Message}");
+        }
 
         try{
             await _cashFlowRepository.CreateIncomeCashFlow(cashFlow);
@@ -97,32 +120,37 @@ public class CashFlowController : ControllerBase{
     }
 
     [HttpPut("income", Name = "UpdateIncomeCashFlow")]
-    public async Task<IActionResult> UpdateIncomeCashFlow([FromBody] UpdateIncomeCashFlowDto dto){
+    public async Task<IActionResult> UpdateIncomeCashFlow([FromForm] UpdateIncomeCashFlowDto dto, [FromHeader] Guid userId, [FromHeader] string token){
+        IncomeCashFlow newIncomeCashFlow;
 
         try{
-            IncomeCashFlow incomeCashFlowExists = await _cashFlowRepository.GetIncomeCashFlowById(dto.Id);
-            if(incomeCashFlowExists == null){
-                return StatusCode(404, "CashFlow not found");
-            }
-            incomeCashFlowExists.ContractId = dto.ContractId ?? incomeCashFlowExists.ContractId;
-            incomeCashFlowExists.Description = dto.Description ?? incomeCashFlowExists.Description;
-            incomeCashFlowExists.Amount = dto.Amount ?? incomeCashFlowExists.Amount;
-            incomeCashFlowExists.TransactionDate = dto.TransactionDate ?? incomeCashFlowExists.TransactionDate;
-            incomeCashFlowExists.Status = dto.Status ?? incomeCashFlowExists.Status;
-            incomeCashFlowExists.Category = dto.Category ?? incomeCashFlowExists.Category;
-            await _cashFlowRepository.UpdateIncomeCashFlow(incomeCashFlowExists);
-            return StatusCode(200, incomeCashFlowExists);
+            newIncomeCashFlow = new IncomeCashFlow(dto.ContractId, userId, dto.Description, dto.Amount, dto.TransactionDate, dto.Status, dto.Category);
+            newIncomeCashFlow.Id = dto.Id;
+            
         }catch(Exception e){
             _logger.LogError(e.Message);
+            return StatusCode(500, $"Error creating IncomeCashFlow: {e.Message}");
+        }
+
+        try{
+            IncomeCashFlow updatedIncomeCashFlow = await _updateIncomeUseCase.Execute(userId, token, newIncomeCashFlow);
+            return StatusCode(200, updatedIncomeCashFlow);
+        }catch(Exception e){
+            _logger.LogError(e.Message);
+            if (e is CommonExceptions commonException)
+            {
+                return StatusCode(commonException.StatusCode, commonException.Message);
+            }
             return StatusCode(500, e.Message);
         }
     }
+
 
     [HttpPut("expense", Name = "UpdateExpenseCashFlow")]
     public async Task<IActionResult> UpdateExpenseCashFlow([FromBody] UpdateExpenseCashFlowDto dto){
 
         try{
-            ExpenseCashFlow expenseCashFlowExists = await _cashFlowRepository.GetExpenseCashFlowById(dto.Id);
+            ExpenseCashFlow? expenseCashFlowExists = await _cashFlowRepository.GetExpenseCashFlowById(dto.Id);
             if(expenseCashFlowExists == null){
                 return StatusCode(404, "CashFlow not found");
             }
@@ -141,13 +169,17 @@ public class CashFlowController : ControllerBase{
     }
 
     [HttpDelete("income/{id}", Name = "DeleteIncomeCashFlow")]
-    public async Task<IActionResult> DeleteIncomeCashFlow(Guid id)
+    public async Task<IActionResult> DeleteIncomeCashFlow([FromRoute] Guid id, [FromHeader] Guid userId, [FromHeader] string token)
     {
         try{
-            IncomeCashFlow cashFlow = await _cashFlowRepository.DeleteIncomeCashFlow(id);
+            bool cashFlow = await _deleteIncomeUseCase.Execute(userId, token, id);
             return StatusCode(200, cashFlow);
         }catch(Exception e){
             _logger.LogError(e.Message);
+            if (e is CommonExceptions commonException)
+            {
+                return StatusCode(commonException.StatusCode, commonException.Message);
+            }
             return StatusCode(500, e.Message);
         }
     }
@@ -156,7 +188,7 @@ public class CashFlowController : ControllerBase{
     public async Task<IActionResult> DeleteExpenseCashFlow(Guid id)
     {
         try{
-            ExpenseCashFlow cashFlow = await _cashFlowRepository.DeleteExpenseCashFlow(id);
+            bool cashFlow = await _cashFlowRepository.DeleteExpenseCashFlow(id);
             return StatusCode(200, cashFlow);
         }catch(Exception e){
             _logger.LogError(e.Message);

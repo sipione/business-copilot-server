@@ -47,6 +47,16 @@ public class IncomeCashFlow : CashFlow
     public override string ToString(){
         return $"Id: {Id}, Description: {Description}, Amount: {Amount}, TransactionDate: {TransactionDate}, Status: {Status}, CreatedAt: {CreatedAt}, UpdatedAt: {UpdatedAt}, Category: {Category}";
     }
+
+    public void UpdateFields(IncomeCashFlow newIncome){
+        ContractId = newIncome.ContractId ?? this.ContractId;
+        Description = newIncome.Description;
+        Amount = newIncome.Amount;
+        TransactionDate = newIncome.TransactionDate;
+        Status = newIncome.Status;
+        Category = newIncome.Category;
+        UpdatedAt = DateTime.Now;
+    }
 }
 
 public class ExpenseCashFlow : CashFlow

@@ -33,7 +33,7 @@ builder.Services.AddSingleton<ICryptographyServices, CryptographyServices>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IUserAuthorizationService, UserAuthorizationService>();
 
-//Usecases
+//Usecases to User
 builder.Services.AddScoped<GetAllUsersUseCase>();
 builder.Services.AddScoped<GetUserByIdUseCase>();
 builder.Services.AddScoped<CreateUserUseCase>();
@@ -41,11 +41,21 @@ builder.Services.AddScoped<UpdateUserUseCase>();
 builder.Services.AddScoped<DeleteUserUseCase>();
 builder.Services.AddScoped<RegisterUserUseCase>();
 builder.Services.AddScoped<LoginUserUseCase>();
+
+//Usecases to Stakejolder
 builder.Services.AddScoped<GetAllStakeholdersUsecase>();
 builder.Services.AddScoped<GetStakeholderByIdUseCase>();
 builder.Services.AddScoped<CreateStakeholderUseCase>();
 builder.Services.AddScoped<UpdateStakeholderUseCase>();
 builder.Services.AddScoped<DeleteStakeholderUseCase>();
+
+//Usecases to IncomeCashFlow
+builder.Services.AddScoped<GetAllIncomesUseCase>();
+builder.Services.AddScoped<GetIncomeByIdUseCase>();
+builder.Services.AddScoped<CreateIncomeUseCase>();
+builder.Services.AddScoped<UpdateIncomeUseCase>();
+builder.Services.AddScoped<DeleteIncomeUseCase>();
+
 
 var app = builder.Build();
 
