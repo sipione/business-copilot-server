@@ -1,9 +1,19 @@
 import Image from "next/image";
 import styles from "./page.module.css";
+import Button from '@mui/material/Button';
+import DeleteIcon from '@mui/icons-material/Delete';
+import SendIcon from '@mui/icons-material/Send';
 
 export default function Home() {
   return (
     <div className={styles.page}>
+      <Button variant="contained">finallll</Button>
+      <Button color="error" variant="contained" startIcon={<DeleteIcon />}>
+        Delete
+      </Button>
+      <Button variant="contained" endIcon={<SendIcon />}>
+        Send
+      </Button>
       <main className={styles.main}>
         <Image
           className={styles.logo}
