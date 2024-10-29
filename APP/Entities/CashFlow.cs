@@ -70,6 +70,16 @@ public class ExpenseCashFlow : CashFlow
 
     public ExpenseCashFlow(){}
 
+    public void UpdateFields(ExpenseCashFlow newExpense){
+        ContractId = newExpense.ContractId ?? this.ContractId;
+        Description = newExpense.Description;
+        Amount = newExpense.Amount;
+        TransactionDate = newExpense.TransactionDate;
+        Status = newExpense.Status;
+        Category = newExpense.Category;
+        UpdatedAt = DateTime.Now;
+    }
+
     public override string ToString(){
         return $"Id: {Id}, Description: {Description}, Amount: {Amount}, TransactionDate: {TransactionDate}, Status: {Status}, CreatedAt: {CreatedAt}, UpdatedAt: {UpdatedAt}, Category: {Category}";
     }

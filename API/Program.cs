@@ -56,6 +56,36 @@ builder.Services.AddScoped<CreateIncomeUseCase>();
 builder.Services.AddScoped<UpdateIncomeUseCase>();
 builder.Services.AddScoped<DeleteIncomeUseCase>();
 
+//Usecases to ExpenseCashFlow
+builder.Services.AddScoped<GetAllExpensesUseCase>();
+builder.Services.AddScoped<GetExpenseByIdUseCase>();
+builder.Services.AddScoped<CreateExpenseUseCase>();
+builder.Services.AddScoped<UpdateExpenseUseCase>();
+builder.Services.AddScoped<DeleteExpenseUseCase>();
+
+//Usecases to Contract
+// builder.Services.AddScoped<GetAllContractsUseCase>();
+// builder.Services.AddScoped<GetContractByIdUseCase>();
+// builder.Services.AddScoped<CreateContractUseCase>();
+// builder.Services.AddScoped<UpdateContractUseCase>();
+// builder.Services.AddScoped<DeleteContractUseCase>();
+
+// //Usecases to Progress
+// builder.Services.AddScoped<GetAllProgressUseCase>();
+// builder.Services.AddScoped<GetProgressByIdUseCase>();
+// builder.Services.AddScoped<CreateProgressUseCase>();
+// builder.Services.AddScoped<UpdateProgressUseCase>();
+// builder.Services.AddScoped<DeleteProgressUseCase>();
+
+// //Usecases to Voucher
+// builder.Services.AddScoped<GetAllVouchersUseCase>();
+// builder.Services.AddScoped<GetVoucherByIdUseCase>();
+// builder.Services.AddScoped<CreateVoucherUseCase>();
+// builder.Services.AddScoped<UpdateVoucherUseCase>();
+// builder.Services.AddScoped<DeleteVoucherUseCase>();
+
+
+
 
 var app = builder.Build();
 
