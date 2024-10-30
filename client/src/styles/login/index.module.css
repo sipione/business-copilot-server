@@ -1,0 +1,42 @@
+.LoginContainer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
+}
+
+.formBox{
+    background: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 4rem;
+    border-radius: 10px;
+    width: 50%;
+}
+
+.swittchLoginRegister{
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.switchItem{
+    cursor: pointer;
+    color: #333;
+    transition: all 0.3s;
+}
+
+.formContainer{
+    width: 100%;
+    background: #f0f0f0;
+}
+
+.LoginFormContainer, .RegisterFormContainer{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 1rem;
+}
