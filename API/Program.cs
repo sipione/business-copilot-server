@@ -8,6 +8,15 @@ using APP.UseCases;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Allow CORS from localhost:3000
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowLocalhost3000",
+        builder => builder.WithOrigins("http://localhost:3000")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod());
+});
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -85,8 +94,6 @@ builder.Services.AddScoped<DeleteExpenseUseCase>();
 // builder.Services.AddScoped<DeleteVoucherUseCase>();
 
 
-
-
 var app = builder.Build();
 
 // Inicializar banco de dados dentro do escopo
@@ -100,7 +107,10 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Configure the HTTP request pipeline.
+app.UseAuthorization();
+
+// Use the CORS policy
+app.UseCors("AllowLocalhost3000");
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
