@@ -34,11 +34,19 @@ public class CashFlowController : ControllerBase{
     }
 
     [HttpGet("income", Name = "GetIncomeCashFlows")]
-    public async Task<IActionResult> GetIncomeCashFlows([FromHeader] Guid userId, [FromHeader] string token)
-    {
+    public async Task<IActionResult> GetIncomeCashFlows([FromHeader] Guid userId, [FromHeader] string token){
         try{
             IEnumerable<IncomeCashFlow> cashFlows = await _getAllIncomesUseCase.Execute(userId, token);
-            return StatusCode(200, cashFlows);
+            var resultFormatted = cashFlows.Select(cf => new {
+                cf.Id,
+                cf.ContractId,
+                cf.Description,
+                cf.Amount,
+                cf.TransactionDate,
+                cf.Status,
+                cf.Category
+            });
+            return StatusCode(200, resultFormatted);
         }catch(Exception e){
             _logger.LogError(e.Message);
             if (e is CommonExceptions commonException)
@@ -48,14 +56,20 @@ public class CashFlowController : ControllerBase{
             return StatusCode(500, e.Message);
         }
     }
-
-
     [HttpGet("expense", Name = "GetExpenseCashFlows")]
-    public async Task<IActionResult> GetExpenseCashFlows([FromHeader] Guid userId, [FromHeader] string token)
-    {
+    public async Task<IActionResult> GetExpenseCashFlows([FromHeader] Guid userId, [FromHeader] string token){
         try{
             IEnumerable<ExpenseCashFlow> cashFlows = await _getAllExpensesUseCase.Execute(userId, token);
-            return StatusCode(200, cashFlows);
+            var resultFormatted = cashFlows.Select(cf => new {
+                cf.Id,
+                cf.ContractId,
+                cf.Description,
+                cf.Amount,
+                cf.TransactionDate,
+                cf.Status,
+                cf.Category
+            });
+            return StatusCode(200, resultFormatted);
         }catch(Exception e){
             _logger.LogError(e.Message);
             if (e is CommonExceptions commonException)
