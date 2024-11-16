@@ -1,3 +1,5 @@
+namespace APP.Enums;
+
 public enum PaymentStatus
 {
     PENDING,

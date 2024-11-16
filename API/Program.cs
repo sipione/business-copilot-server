@@ -72,6 +72,11 @@ builder.Services.AddScoped<CreateExpenseUseCase>();
 builder.Services.AddScoped<UpdateExpenseUseCase>();
 builder.Services.AddScoped<DeleteExpenseUseCase>();
 
+//Usecases to CashFlow (general usecase)
+builder.Services.AddScoped<GetIncomeCategoriesUseCase>();
+builder.Services.AddScoped<GetExpensesCategoriesUseCase>();
+builder.Services.AddScoped<GetCashflowStatusUseCase>();
+
 //Usecases to Contract
 // builder.Services.AddScoped<GetAllContractsUseCase>();
 // builder.Services.AddScoped<GetContractByIdUseCase>();

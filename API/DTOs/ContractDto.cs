@@ -1,3 +1,5 @@
+using APP.Enums;
+
 public class CreateContractDto{
     public Guid UserId { get; set; }
     public Guid StakeholderId { get; set; }

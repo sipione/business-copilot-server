@@ -1,4 +1,7 @@
+using APP.Enums;
+
 namespace APP.Entities;
+
 public class CashFlow
 {
     public Guid Id { get; set; }

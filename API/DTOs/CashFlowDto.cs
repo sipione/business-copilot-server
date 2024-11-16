@@ -1,4 +1,5 @@
 using APP.Entities;
+using APP.Enums;
 
 public class CreateIncomeCashFlowDto{
     public Guid? ContractId { get; set; }

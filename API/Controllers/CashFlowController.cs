@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using APP.Entities;
 using APP.UseCases;
 using APP.Exceptions;
+using APP.Enums;
 namespace API.Controllers;
 
 [ApiController]
@@ -18,8 +19,11 @@ public class CashFlowController : ControllerBase{
     private readonly CreateExpenseUseCase _createExpenseUseCase;
     private readonly UpdateExpenseUseCase _updateExpenseUseCase;
     private readonly DeleteExpenseUseCase _deleteExpenseUseCase;
+    private readonly GetIncomeCategoriesUseCase _getIncomeCategoriesUseCase;
+    private readonly GetExpensesCategoriesUseCase _getExpensesCategoriesUseCase;
+    private readonly GetCashflowStatusUseCase _getCashflowStatusUseCase;
 
-    public CashFlowController(ILogger<CashFlowController> logger, GetAllIncomesUseCase getAllIncomesUseCase, GetIncomeByIdUseCase getIncomeByIdUseCase, CreateIncomeUseCase createIncomeUseCase, UpdateIncomeUseCase updateIncomeUseCase, DeleteIncomeUseCase deleteIncomeUseCase, GetAllExpensesUseCase getAllExpensesUseCase, GetExpenseByIdUseCase getExpenseByIdUseCase, CreateExpenseUseCase createExpenseUseCase, UpdateExpenseUseCase updateExpenseUseCase, DeleteExpenseUseCase deleteExpenseUseCase){
+    public CashFlowController(ILogger<CashFlowController> logger, GetAllIncomesUseCase getAllIncomesUseCase, GetIncomeByIdUseCase getIncomeByIdUseCase, CreateIncomeUseCase createIncomeUseCase, UpdateIncomeUseCase updateIncomeUseCase, DeleteIncomeUseCase deleteIncomeUseCase, GetAllExpensesUseCase getAllExpensesUseCase, GetExpenseByIdUseCase getExpenseByIdUseCase, CreateExpenseUseCase createExpenseUseCase, UpdateExpenseUseCase updateExpenseUseCase, DeleteExpenseUseCase deleteExpenseUseCase, GetIncomeCategoriesUseCase getIncomeCategoriesUseCase, GetExpensesCategoriesUseCase getExpensesCategoriesUseCase, GetCashflowStatusUseCase getCashflowStatusUseCase){
         _logger = logger;
         _getAllIncomesUseCase = getAllIncomesUseCase;
         _getIncomeByIdUseCase = getIncomeByIdUseCase;
@@ -31,6 +35,9 @@ public class CashFlowController : ControllerBase{
         _createExpenseUseCase = createExpenseUseCase;
         _updateExpenseUseCase = updateExpenseUseCase;
         _deleteExpenseUseCase = deleteExpenseUseCase;
+        _getIncomeCategoriesUseCase = getIncomeCategoriesUseCase;
+        _getExpensesCategoriesUseCase = getExpensesCategoriesUseCase;
+        _getCashflowStatusUseCase = getCashflowStatusUseCase;
     }
 
     [HttpGet("income", Name = "GetIncomeCashFlows")]
@@ -56,6 +63,7 @@ public class CashFlowController : ControllerBase{
             return StatusCode(500, e.Message);
         }
     }
+
     [HttpGet("expense", Name = "GetExpenseCashFlows")]
     public async Task<IActionResult> GetExpenseCashFlows([FromHeader] Guid userId, [FromHeader] string token){
         try{
@@ -81,8 +89,7 @@ public class CashFlowController : ControllerBase{
     }
 
     [HttpGet("income/{id}", Name = "GetIncomeCashFlowById")]
-    public async Task<IActionResult> GetIncomeCashFlowById([FromRoute] Guid id, [FromHeader] Guid userId, [FromHeader] string token)
-    {
+    public async Task<IActionResult> GetIncomeCashFlowById([FromRoute] Guid id, [FromHeader] Guid userId, [FromHeader] string token){
         try{
             IncomeCashFlow cashFlow = await _getIncomeByIdUseCase.Execute(userId, token, id);
             return StatusCode(200, cashFlow);
@@ -173,7 +180,6 @@ public class CashFlowController : ControllerBase{
         }
     }
 
-
     [HttpPut("expense", Name = "UpdateExpenseCashFlow")]
     public async Task<IActionResult> UpdateExpenseCashFlow([FromForm] UpdateExpenseCashFlowDto dto, [FromHeader] Guid userId, [FromHeader] string token){
         ExpenseCashFlow newExpenseCashFlow;
@@ -201,8 +207,7 @@ public class CashFlowController : ControllerBase{
     }
 
     [HttpDelete("income/{id}", Name = "DeleteIncomeCashFlow")]
-    public async Task<IActionResult> DeleteIncomeCashFlow([FromRoute] Guid id, [FromHeader] Guid userId, [FromHeader] string token)
-    {
+    public async Task<IActionResult> DeleteIncomeCashFlow([FromRoute] Guid id, [FromHeader] Guid userId, [FromHeader] string token){
         try{
             bool cashFlow = await _deleteIncomeUseCase.Execute(userId, token, id);
             return StatusCode(200, cashFlow);
@@ -217,8 +222,7 @@ public class CashFlowController : ControllerBase{
     }
     
     [HttpDelete("expense/{id}", Name = "DeleteExpenseCashFlow")]
-    public async Task<IActionResult> DeleteExpenseCashFlow([FromRoute] Guid id, [FromHeader] Guid userId, [FromHeader] string token)
-    {
+    public async Task<IActionResult> DeleteExpenseCashFlow([FromRoute] Guid id, [FromHeader] Guid userId, [FromHeader] string token){
         try{
             bool cashFlow = await _deleteExpenseUseCase.Execute(userId, token, id);
             return StatusCode(200, cashFlow);
@@ -230,5 +234,49 @@ public class CashFlowController : ControllerBase{
             }
             return StatusCode(500, e.Message);
         }
+    }
+
+    [HttpGet("enums", Name="GetCashFlowEnums")]
+    public async Task<IActionResult> GetCashFlowEnums([FromHeader] Guid userId, [FromHeader] string token){
+        IEnumerable<IncomeCategory> incomeCategories;
+        IEnumerable<ExpensesCategory> expenseCategories;
+        IEnumerable<PaymentStatus> cashflowStatus;
+
+        try{
+            incomeCategories = await _getIncomeCategoriesUseCase.Execute(userId, token);
+        }catch(Exception e){
+            _logger.LogError(e.Message);
+            if (e is CommonExceptions commonException)
+            {
+                return StatusCode(commonException.StatusCode, commonException.Message);
+            }
+            return StatusCode(500, e.Message);
+        }
+        try{
+            expenseCategories = await _getExpensesCategoriesUseCase.Execute(userId, token);
+        }catch(Exception e){
+            _logger.LogError(e.Message);
+            if (e is CommonExceptions commonException)
+            {
+                return StatusCode(commonException.StatusCode, commonException.Message);
+            }
+            return StatusCode(500, e.Message);
+        }
+        try{
+            cashflowStatus = await _getCashflowStatusUseCase.Execute(userId, token);
+        }catch(Exception e){
+            _logger.LogError(e.Message);
+            if (e is CommonExceptions commonException)
+            {
+                return StatusCode(commonException.StatusCode, commonException.Message);
+            }
+            return StatusCode(500, e.Message);
+        }
+
+        return StatusCode(200, new {
+            incomeCategories,
+            expenseCategories,
+            cashflowStatus
+        });
     }
 }

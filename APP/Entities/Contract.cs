@@ -1,3 +1,5 @@
+using APP.Enums;
+
 namespace APP.Entities;
 
 public class Contract
