@@ -89,7 +89,24 @@ public class UserController : ControllerBase{
     public async Task<IActionResult> Get([FromRoute]Guid userId, [FromHeader] string token, [FromHeader] Guid requestUserId){
         try{
             User user = await _getUserByIdUseCase.Execute(userId, requestUserId, token);
-            return StatusCode(200, user);
+
+            List<StakeholderRefDto> stakeholders = user.Stakeholders.Select(s => new StakeholderRefDto{
+                Id = s.Id,
+                Name = s.Name,
+                Type = s.Type
+            }).ToList();
+
+            UserResponseDto response = new UserResponseDto{
+                Name = user.Name,
+                Email = user.Email,
+                Role = user.Role,
+                Status = user.Status,
+                ProfilePicture = user.ProfilePicture,
+                Stakeholders = stakeholders
+            };
+
+            return StatusCode(200, response);
+
         }catch(Exception e){
             _logger.LogError(e.Message);
             if (e is CommonExceptions commonException)

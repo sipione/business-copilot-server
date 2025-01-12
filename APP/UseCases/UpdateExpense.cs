@@ -27,7 +27,7 @@ public class UpdateExpenseUseCase{
             throw CommonExceptions.Forbidden("Forbidden: you don't have permission to update expenses");
         }
 
-        ExpenseCashFlow? existingExpense = await _cashFlowRepository.GetExpenseCashFlowById(newExpense.Id);
+        ExpenseCashFlow? existingExpense = await _cashFlowRepository.GetExpenseCashFlowById(newExpense.Id, user.Id);
 
         if(existingExpense == null){
             throw CommonExceptions.NotFound("Not found: expense not found");

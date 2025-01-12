@@ -26,3 +26,10 @@ public class UpdateStakeholderDto
     public StakeholderType Type { get; set; }
     public AccountStatus Status { get; set; }
 }
+
+public class StakeholderRefDto
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; }
+    public StakeholderType Type { get; set; }
+}

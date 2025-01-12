@@ -27,7 +27,7 @@ public class UpdateIncomeUseCase{
             throw CommonExceptions.Forbidden("Forbidden: you don't have permission to update incomes");
         }
 
-        IncomeCashFlow? existingIncome = await _cashFlowRepository.GetIncomeCashFlowById(newIncome.Id);
+        IncomeCashFlow? existingIncome = await _cashFlowRepository.GetIncomeCashFlowById(newIncome.Id, user.Id);
 
         if(existingIncome == null){
             throw CommonExceptions.NotFound("Not found: income not found");

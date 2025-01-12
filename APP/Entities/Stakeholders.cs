@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Microsoft.VisualBasic;
 
 namespace APP.Entities;
@@ -16,10 +17,14 @@ public class Stakeholder{
     public AccountStatus Status { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
-    public virtual ICollection<IncomeCashFlow> IncomeCashFlows { get; set; }
-    public virtual ICollection<ExpenseCashFlow> ExpenseCashFlows { get; set; }
-    public virtual ICollection<Voucher> Vouchers { get; set; }
-    public virtual ICollection<Contract> Contracts { get; set; }
+    [JsonIgnore]
+    public ICollection<IncomeCashFlow> IncomeCashFlows { get; set; }
+    [JsonIgnore]
+    public ICollection<ExpenseCashFlow> ExpenseCashFlows { get; set; }
+    [JsonIgnore]
+    public ICollection<Voucher> Vouchers { get; set; }
+    [JsonIgnore]
+    public ICollection<Contract> Contracts { get; set; }
 
 
     public Stakeholder(Guid userId, string name, string email, string? phone, string? address, string? city, string? state, string? country, string? zipCode, StakeholderType type, AccountStatus status)

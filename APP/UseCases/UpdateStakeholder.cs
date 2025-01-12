@@ -27,7 +27,7 @@ public class UpdateStakeholderUseCase{
             throw CommonExceptions.Forbidden("Forbidden: you don't have permission to update this stakeholder");
         }
 
-        Stakeholder stakeholder = await _stakeholderRepository.GetById(stakeholderId);
+        Stakeholder stakeholder = await _stakeholderRepository.GetById(stakeholderId, userAuthenticated.Id);
 
         if(stakeholder == null){
             throw CommonExceptions.NotFound("Stakeholder not found");

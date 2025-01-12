@@ -26,10 +26,12 @@ public class GetUserByIdUseCase{
             throw CommonExceptions.Forbidden("Forbidden: you don't have permission to view users");
         }
 
-        User user = await _userRepository.GetById(userId);
+        User? user = await _userRepository.GetByIdComplete(userId);
+
         if(user == null){
             throw CommonExceptions.NotFound("User not found");
         }
+
         return user;
     }
 }

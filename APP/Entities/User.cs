@@ -7,19 +7,26 @@ public class User
     public Guid Id { get; set; }
     public string Name { get; set; }
     public string Email { get; set; }
+    [JsonIgnore]
     public string Password { get; set; }
     public UserRole Role { get; set; }
     public AccountStatus Status { get; set; }
     public string? ProfilePicture { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
-    public virtual ICollection<Contract> Contracts { get; set; }
-    public virtual ICollection<IncomeCashFlow> IncomeCashFlows { get; set; }
-    public virtual ICollection<ExpenseCashFlow> ExpenseCashFlows { get; set; }
-    public virtual ICollection<SubAccounts> SubAccounts { get; set; }
-    public virtual ICollection<Stakeholder> Stakeholders { get; set; }
-    public virtual ICollection<Voucher> Vouchers { get; set; }
-    public virtual ICollection<Progress> Progresses { get; set; }
+    [JsonIgnore]
+    public ICollection<Contract> Contracts { get; set; }
+    [JsonIgnore]
+    public ICollection<IncomeCashFlow> IncomeCashFlows { get; set; }
+    [JsonIgnore]
+    public ICollection<ExpenseCashFlow> ExpenseCashFlows { get; set; }
+    [JsonIgnore]
+    public ICollection<SubAccounts> SubAccounts { get; set; }
+    public ICollection<Stakeholder> Stakeholders { get; set; }
+    
+    public ICollection<Voucher> Vouchers { get; set; }
+    [JsonIgnore]
+    public ICollection<Progress> Progresses { get; set; }
     public List<Permitions> UserPermitionsList { get; set; }
 
     public User(string name, string email, string password, UserRole role, string? profilePicture, AccountStatus? accountStatus){

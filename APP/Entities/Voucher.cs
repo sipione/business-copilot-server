@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace APP.Entities;
 public class Voucher
 {
@@ -12,8 +14,10 @@ public class Voucher
     public AccountStatus Status { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
-    public virtual ICollection<Contract> Contracts { get; set; }
-    public virtual User OwnerData { get; set; }
+    [JsonIgnore]
+    public ICollection<Contract> Contracts { get; set; }
+    [JsonIgnore]
+    public User OwnerData { get; set; }
 
     public Voucher(Guid userId, Guid? stackholderId, string code, decimal value, DateTime? expirationDate, int? usageLimit, int usageCount, AccountStatus status)
     {

@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using APP.Enums;
 
 namespace APP.Entities;
@@ -25,9 +26,10 @@ public class Contract
     public DateTime? EndDate { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
-    public virtual User OwnerData { get; set; }
-    public virtual Voucher? Voucher { get; set; }
-    public virtual Stakeholder Stakeholder { get; set; }
+    [JsonIgnore]
+    public Voucher? Voucher { get; set; }
+    [JsonIgnore]
+    public Stakeholder Stakeholder { get; set; }
 
     public Contract(Guid userId, Guid stakeholderId, string title, string description, float initialAmount, float? discount, int? installments, float? interest, float? penalty, float? totalAmount, float? paidAmount, float? remainingAmount, string documentPath, Guid? voucherId, PaymentStatus paymentStatus, ContractStatus contractStatus, DateTime startDate, DateTime? endDate)
     {

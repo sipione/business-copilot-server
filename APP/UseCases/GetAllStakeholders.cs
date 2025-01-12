@@ -28,6 +28,11 @@ public class GetAllStakeholdersUsecase{
         }
 
         IEnumerable<Stakeholder> stakeholders = await _stakeholderRepository.GetAll(user.Id);
+
+        if(stakeholders == null || !stakeholders.Any()){
+            throw CommonExceptions.NotFound("Not found: no stakeholders found");
+        }
+
         return stakeholders;
     }
 }
