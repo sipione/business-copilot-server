@@ -53,7 +53,7 @@ public class StakeholderController : ControllerBase{
     
 
     [HttpPost(Name = "CreateStakeholder")]
-    public async Task<IActionResult> Create([FromForm] CreateStakeholderDto stakeholderDto, [FromForm] Guid userId, [FromForm] string token){
+    public async Task<IActionResult> Create([FromForm] CreateStakeholderDto stakeholderDto, [FromHeader] Guid userId, [FromHeader] string token){
         try{
             Stakeholder stakeholder = new Stakeholder(
                 userId, 
@@ -70,6 +70,7 @@ public class StakeholderController : ControllerBase{
             );
 
             Stakeholder createdStakeholder = await _createStakeholderUseCase.Execute(userId, token, stakeholder);
+
             return StatusCode(201, createdStakeholder);
         }catch(Exception e){
             _logger.LogError(e.Message);

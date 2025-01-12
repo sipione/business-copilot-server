@@ -27,7 +27,7 @@ public class GetExpenseByIdUseCase{
             throw CommonExceptions.Forbidden("Forbidden: you don't have permission to get expenses");
         }
 
-        ExpenseCashFlow? expense = await _cashFlowRepository.GetExpenseCashFlowById(expenseId);
+        ExpenseCashFlow? expense = await _cashFlowRepository.GetExpenseCashFlowById(expenseId, user.Id);
         
         if(expense == null){
             throw CommonExceptions.NotFound("Not found: expense not found");

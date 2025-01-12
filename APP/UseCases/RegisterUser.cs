@@ -18,6 +18,7 @@ public class RegisterUserUseCase{
 
     public async Task<Guid> Execute(User newUser){
         User userExists = await _userRepository.GetByEmail(newUser.Email);
+        
         if (userExists != null){
             throw CommonExceptions.Conflict("User already exists");
         }

@@ -26,7 +26,7 @@ public class GetAllIncomesUseCase{
             throw CommonExceptions.Forbidden("Forbidden: you don't have permission to view incomes");
         }
 
-        IEnumerable<IncomeCashFlow> incomes = await _cashFlowRepository.GetIncomeCashFlows();
+        IEnumerable<IncomeCashFlow> incomes = await _cashFlowRepository.GetIncomeCashFlows(user.Id);
 
         if(incomes == null || !incomes.Any()){
             throw CommonExceptions.NotFound("Not found: there are no incomes");

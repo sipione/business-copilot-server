@@ -1,7 +1,6 @@
 using APP.Entities;
 using APP.Interfaces.Repository;
 using APP.Interfaces.Services;
-using APP.Services;
 using APP.Exceptions;
 
 namespace APP.UseCases;
@@ -28,7 +27,7 @@ public class GetAllStakeholdersUsecase{
             throw CommonExceptions.Forbidden("Forbidden: you don't have permission to view stakeholders");
         }
 
-        IEnumerable<Stakeholder> stakeholders = await _stakeholderRepository.GetAll();
+        IEnumerable<Stakeholder> stakeholders = await _stakeholderRepository.GetAll(user.Id);
         return stakeholders;
     }
 }

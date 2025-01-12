@@ -13,6 +13,8 @@ public class CashFlow
     public PaymentStatus Status { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+    public virtual User OwnerData { get; set; }
+    public virtual Contract? Contract { get; set; }
 
     public CashFlow(Guid? ContractId, Guid UserId, string Description, float Amount, DateTime TransactionDate, PaymentStatus Status)
     {

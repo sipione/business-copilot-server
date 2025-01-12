@@ -30,6 +30,11 @@ namespace APP.UseCases
                 throw CommonExceptions.Forbidden("Forbidden: you don't have permission to create stakeholders");
             }
 
+            if(newStakeholder.Email == null || newStakeholder.Name == null || newStakeholder.Type == null || newStakeholder.Status == null)
+            {
+                throw CommonExceptions.BadRequest("Bad Request: email, name, type and status are required");
+            }
+
             Stakeholder createdStakeholder = await _stakeholderRepository.Create(newStakeholder);
             
             return createdStakeholder;

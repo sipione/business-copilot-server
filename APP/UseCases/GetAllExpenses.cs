@@ -27,7 +27,7 @@ public class GetAllExpensesUseCase{
             throw CommonExceptions.Forbidden("Forbidden: you don't have permission to get expenses");
         }
 
-        IEnumerable<ExpenseCashFlow> expenses = await _cashFlowRepository.GetExpenseCashFlows();
+        IEnumerable<ExpenseCashFlow> expenses = await _cashFlowRepository.GetExpenseCashFlows(user.Id);
         
         return expenses;
     }

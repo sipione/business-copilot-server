@@ -15,6 +15,18 @@ public class UserRepository : IUserRepository{
         User user = await _context.Users.FindAsync(id);
         return user;
     }
+    public async Task<User?> GetByIdComplete(Guid id){
+        User? user = await _context.Users
+            .Include(u => u.Stakeholders)
+            .Include(u => u.Contracts)
+            .Include(u => u.Vouchers)
+            .Include(u => u.SubAccounts)
+            .Include(u => u.IncomeCashFlows)
+            .Include(u => u.ExpenseCashFlows)
+            .Include(u => u.Progresses)
+            .FirstOrDefaultAsync(u => u.Id == id);
+        return user;
+    }
     public async Task<User> GetByEmail(string email){
         return await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
     }

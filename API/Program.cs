@@ -5,6 +5,7 @@ using APP.Interfaces.Repository;
 using APP.Interfaces.Services;
 using APP.Services;
 using APP.UseCases;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,7 @@ builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
     });
 
 builder.Services.AddDbContext<ApplicationDbContext>();

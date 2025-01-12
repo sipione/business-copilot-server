@@ -12,8 +12,10 @@ public class SubAccounts{
     public SubAccountRole Role { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
-    public List<Progress> Progresses { get; set; }
+    public virtual ICollection<Progress> Progresses { get; set; }
     public List<Permitions> PermitionsList { get; set; }
+    public virtual User OwnerData { get; set; }
+    public virtual Stakeholder Stakeholder { get; set; }
 
     public SubAccounts(Guid userId, Guid stakeholderId, string name, string? description, string email, string password, SubAccountRole role){
         Id = Guid.NewGuid();

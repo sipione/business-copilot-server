@@ -2,10 +2,10 @@ using APP.Entities;
 namespace APP.Interfaces.Repository;
 public interface ICashFlowRepository
 {
-    Task<IEnumerable<IncomeCashFlow>> GetIncomeCashFlows();
-    Task<IEnumerable<ExpenseCashFlow>> GetExpenseCashFlows();
-    Task<IncomeCashFlow?> GetIncomeCashFlowById(Guid id);
-    Task<ExpenseCashFlow?> GetExpenseCashFlowById(Guid id);
+    Task<IEnumerable<IncomeCashFlow>> GetIncomeCashFlows(Guid userId);
+    Task<IEnumerable<ExpenseCashFlow>> GetExpenseCashFlows(Guid userId);
+    Task<IncomeCashFlow?> GetIncomeCashFlowById(Guid id, Guid userId);
+    Task<ExpenseCashFlow?> GetExpenseCashFlowById(Guid id, Guid userId);
     Task<IncomeCashFlow> CreateIncomeCashFlow(IncomeCashFlow cashFlow);
     Task<ExpenseCashFlow> CreateExpenseCashFlow(ExpenseCashFlow cashFlow);
     Task<IncomeCashFlow> UpdateIncomeCashFlow(IncomeCashFlow cashFlow);

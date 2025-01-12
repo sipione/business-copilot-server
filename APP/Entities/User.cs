@@ -1,4 +1,5 @@
 using APP.Enums;
+using System.Text.Json.Serialization;
 
 namespace APP.Entities;
 public class User
@@ -12,13 +13,13 @@ public class User
     public string? ProfilePicture { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
-    public List<Contract> Contracts { get; set; }
-    public List<IncomeCashFlow> IncomeCashFlows { get; set; }
-    public List<ExpenseCashFlow> ExpenseCashFlows { get; set; }
-    public List<SubAccounts> SubAccounts { get; set; }
-    public List<Stakeholder> Stakeholders { get; set; }
-    public List<Voucher> Vouchers { get; set; }
-    public List<Progress> Progresses { get; set; }
+    public virtual ICollection<Contract> Contracts { get; set; }
+    public virtual ICollection<IncomeCashFlow> IncomeCashFlows { get; set; }
+    public virtual ICollection<ExpenseCashFlow> ExpenseCashFlows { get; set; }
+    public virtual ICollection<SubAccounts> SubAccounts { get; set; }
+    public virtual ICollection<Stakeholder> Stakeholders { get; set; }
+    public virtual ICollection<Voucher> Vouchers { get; set; }
+    public virtual ICollection<Progress> Progresses { get; set; }
     public List<Permitions> UserPermitionsList { get; set; }
 
     public User(string name, string email, string password, UserRole role, string? profilePicture, AccountStatus? accountStatus){
@@ -42,7 +43,7 @@ public class User
         this.AllowPermitionsByRole();
     }
 
-    public User() { 
+    public User() {
         UserPermitionsList = new List<Permitions>();
     }
 

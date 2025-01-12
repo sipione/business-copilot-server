@@ -12,19 +12,18 @@ public class StakeholderRepository : IStakeholderRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<Stakeholder>> GetAll()
+    public async Task<IEnumerable<Stakeholder>> GetAll(Guid userId)
     {
-        return await _context.Stakeholders.ToListAsync();
+        return await _context.Stakeholders.Where(s => s.UserId == userId).ToListAsync();
     }
 
-    public async Task<Stakeholder> GetById(Guid id)
-    {
-        return await _context.Stakeholders.FindAsync(id);
+    public async Task<Stakeholder?> GetById(Guid id, Guid userId){
+        return await _context.Stakeholders.FirstOrDefaultAsync(stakeholder => stakeholder.Id == id && stakeholder.UserId == userId);
     }
     
-    public async Task<Stakeholder> GetByName(string name)
+    public async Task<Stakeholder?> GetByName(string name, Guid userId)
     {
-        return await _context.Stakeholders.FirstOrDefaultAsync(s => s.Name == name);
+        return await _context.Stakeholders.FirstOrDefaultAsync(s => s.Name == name && s.UserId == userId);
     }
     
     public async Task<Stakeholder> GetByUser(Guid userId)
@@ -32,9 +31,9 @@ public class StakeholderRepository : IStakeholderRepository
         return await _context.Stakeholders.FirstOrDefaultAsync(s => s.UserId == userId);
     }
     
-    public async Task<Stakeholder> GetByEmail(string email)
+    public async Task<Stakeholder?> GetByEmail(string email, Guid userId)
     {
-        return await _context.Stakeholders.FirstOrDefaultAsync(s => s.Email == email);
+        return await _context.Stakeholders.FirstOrDefaultAsync(s => s.Email == email && s.UserId == userId);
     }
 
     public async Task<Stakeholder> Create(Stakeholder stakeholder)

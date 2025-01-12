@@ -27,7 +27,12 @@ public class GetStakeholderByIdUseCase{
             throw CommonExceptions.Forbidden("Forbidden: you don't have permission to view stakeholders");
         }
 
-        Stakeholder stakeholder = await _stakeholderRepository.GetById(id);
+        Stakeholder? stakeholder = await _stakeholderRepository.GetById(id, user.Id);
+
+        if(stakeholder == null){
+            throw CommonExceptions.NotFound("Stakeholder not found");
+        }
+
         return stakeholder;
     }
 }

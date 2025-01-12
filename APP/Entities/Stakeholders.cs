@@ -1,3 +1,5 @@
+using Microsoft.VisualBasic;
+
 namespace APP.Entities;
 public class Stakeholder{
     public Guid Id { get; set; }
@@ -14,10 +16,11 @@ public class Stakeholder{
     public AccountStatus Status { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
-    public List<IncomeCashFlow> IncomeCashFlows { get; set; }
-    public List<ExpenseCashFlow> ExpenseCashFlows { get; set; }
-    public List<Voucher> Vouchers { get; set; }
-    public List<Contract> Contracts { get; set; }
+    public virtual ICollection<IncomeCashFlow> IncomeCashFlows { get; set; }
+    public virtual ICollection<ExpenseCashFlow> ExpenseCashFlows { get; set; }
+    public virtual ICollection<Voucher> Vouchers { get; set; }
+    public virtual ICollection<Contract> Contracts { get; set; }
+
 
     public Stakeholder(Guid userId, string name, string email, string? phone, string? address, string? city, string? state, string? country, string? zipCode, StakeholderType type, AccountStatus status)
     {

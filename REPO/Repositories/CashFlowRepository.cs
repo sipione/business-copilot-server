@@ -7,21 +7,21 @@ public class CashFlowRepository : ICashFlowRepository{
     public CashFlowRepository(ApplicationDbContext context){
         _context = context;
     }
-    public async Task<IEnumerable<IncomeCashFlow>> GetIncomeCashFlows(){
-        IEnumerable<IncomeCashFlow> cashFlows = await _context.IncomeCashFlows.ToListAsync();
-        return cashFlows;
+    public async Task<IEnumerable<IncomeCashFlow>> GetIncomeCashFlows(Guid userId)
+    {
+        return await _context.IncomeCashFlows.Where(cf => cf.UserId == userId).ToListAsync();
     }
-    public async Task<IEnumerable<ExpenseCashFlow>> GetExpenseCashFlows(){
-        IEnumerable<ExpenseCashFlow> cashFlows = await _context.ExpenseCashFlows.ToListAsync();
-        return cashFlows;
+    public async Task<IEnumerable<ExpenseCashFlow>> GetExpenseCashFlows(Guid userId)
+    {
+        return await _context.ExpenseCashFlows.Where(cf => cf.UserId == userId).ToListAsync();
     }
-    public async Task<IncomeCashFlow?> GetIncomeCashFlowById(Guid id){
-        IncomeCashFlow? cashFlow = await _context.IncomeCashFlows.FindAsync(id);
-        return cashFlow;
+    public async Task<IncomeCashFlow?> GetIncomeCashFlowById(Guid id, Guid userId)
+    {
+        return await _context.IncomeCashFlows.FirstOrDefaultAsync(cf => cf.Id == id && cf.UserId == userId);
     }
-    public async Task<ExpenseCashFlow?> GetExpenseCashFlowById(Guid id){
-        ExpenseCashFlow? cashFlow = await _context.ExpenseCashFlows.FindAsync(id);
-        return cashFlow;
+    public async Task<ExpenseCashFlow?> GetExpenseCashFlowById(Guid id, Guid userId)
+    {
+        return await _context.ExpenseCashFlows.FirstOrDefaultAsync(cf => cf.Id == id && cf.UserId == userId);
     }
     public async Task<IncomeCashFlow> CreateIncomeCashFlow(IncomeCashFlow cashFlow){
         _context.IncomeCashFlows.Add(cashFlow);

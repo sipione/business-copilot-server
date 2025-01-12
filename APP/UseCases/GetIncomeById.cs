@@ -27,7 +27,7 @@ public class GetIncomeByIdUseCase{
             throw CommonExceptions.Forbidden("Forbidden: you don't have permission to view incomes");
         }
 
-        IncomeCashFlow? income = await _cashFlowRepository.GetIncomeCashFlowById(incomeId);
+        IncomeCashFlow? income = await _cashFlowRepository.GetIncomeCashFlowById(incomeId, user.Id);
 
         if(income == null){
             throw CommonExceptions.NotFound("Not found: income not found");

@@ -2,7 +2,6 @@ using APP.Entities;
 using APP.Exceptions;
 using APP.Interfaces.Repository;
 using APP.Interfaces.Services;
-using APP.Services;
 
 namespace APP.UseCases;
 
