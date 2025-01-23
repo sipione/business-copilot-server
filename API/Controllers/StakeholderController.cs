@@ -99,7 +99,7 @@ public class StakeholderController : ControllerBase{
     }
 
     [HttpDelete("{id}", Name = "DeleteStakeholder")]
-    public async Task<IActionResult> Delete([FromRoute] Guid id, [FromForm] Guid userId, [FromForm] string token){
+    public async Task<IActionResult> Delete([FromRoute] Guid id, [FromHeader] Guid userId, [FromHeader] String token){
         try{
             await _deleteStakeholderUseCase.Execute(userId, token, id);
             return StatusCode(204);
