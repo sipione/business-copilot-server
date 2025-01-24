@@ -1,11 +1,9 @@
 using REPO.Data;
-using Microsoft.AspNetCore.Builder;
-using APP.Entities;
 using APP.Interfaces.Repository;
 using APP.Interfaces.Services;
 using APP.Services;
 using APP.UseCases;
-using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -104,14 +102,21 @@ builder.Services.AddScoped<GetCashflowStatusUseCase>();
 var app = builder.Build();
 
 // Inicializar banco de dados dentro do escopo
+// using (var scope = app.Services.CreateScope())
+// {
+//     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+//     string path = Path.Combine(Directory.GetCurrentDirectory(), "EasyBussiness.sqlite");
+//     if (!File.Exists(path))
+//     {
+//         SQLiteInitializer.Initialize(dbContext);
+//     }
+// }
+
+// Initialize database within the scope USING MIGRATIONS
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    string path = Path.Combine(Directory.GetCurrentDirectory(), "EasyBussiness.sqlite");
-    if (!File.Exists(path))
-    {
-        SQLiteInitializer.Initialize(dbContext);
-    }
+    dbContext.Database.Migrate();
 }
 
 app.UseAuthorization();
