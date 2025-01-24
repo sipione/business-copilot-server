@@ -8,13 +8,13 @@ Our primary goal is to create a reliable, intuitive platform that requires minim
 
 ## Next Steps
 
-- Enhance the database structure.
-- [ x ] Create database migrations.
-- Strengthen cryptography with salt.
-- Implement JWT for authentication (access and refresh tokens).
-- Add caching to authentication middleware to reduce database access for every request.
-- Apply CI/CD using Jenkins to autodeploy in the VPS
-- Integrate the existing WhatsApp chatbot (developed in Node.js) with the API for streamlined CRUD operations.
+- [ ] Enhance the database structure.
+- [x] Create database migrations.
+- [ ] Strengthen cryptography with salt.
+- [ ] Implement JWT for authentication (access and refresh tokens).
+- [ ] Add caching to authentication middleware to reduce database access for every request.
+- [ ] Apply CI/CD using Jenkins to autodeploy in the VPS
+- [ ] Integrate the existing WhatsApp chatbot (developed in Node.js) with the API for streamlined CRUD operations.
 
 ---
 
