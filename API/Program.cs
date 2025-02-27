@@ -57,6 +57,7 @@ builder.Services.AddScoped<GetStakeholderByIdUseCase>();
 builder.Services.AddScoped<CreateStakeholderUseCase>();
 builder.Services.AddScoped<UpdateStakeholderUseCase>();
 builder.Services.AddScoped<DeleteStakeholderUseCase>();
+builder.Services.AddScoped<GetStakeholderEnumsUseCase>();
 
 //Usecases to IncomeCashFlow
 builder.Services.AddScoped<GetAllIncomesUseCase>();

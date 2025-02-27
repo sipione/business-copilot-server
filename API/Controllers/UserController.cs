@@ -155,7 +155,7 @@ public class UserController : ControllerBase{
     }
 
     [HttpPost("register", Name = "Register")]
-    public async Task<IActionResult> Register([FromForm] CreateUserDto dto){
+    public async Task<IActionResult> Register([FromForm] RegisterDto dto){
         string? profilePicturePath = null;
         if (dto.ProfilePicture != null){
             profilePicturePath = SaveProfilePicture(dto.ProfilePicture);
@@ -165,7 +165,7 @@ public class UserController : ControllerBase{
             dto.Name,
             dto.Email,
             _cryptographyServices.Encrypt(dto.Password),
-            UserRole.ORDINARY,
+            UserRole.ADMIN,
             profilePicturePath,
             AccountStatus.ACTIVE
         );
