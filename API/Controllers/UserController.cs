@@ -165,14 +165,15 @@ public class UserController : ControllerBase{
             dto.Name,
             dto.Email,
             _cryptographyServices.Encrypt(dto.Password),
-            UserRole.ADMIN,
+            UserRole.ORDINARY,
             profilePicturePath,
             AccountStatus.ACTIVE
         );
 
         try{
-            await _registerUserUseCase.Execute(newUser);
-            return StatusCode(201, "User registered");
+            User user = await _registerUserUseCase.Execute(newUser);
+            string token = _loginUserUseCase.GenerateToken(user.Id, user.Email);
+            return StatusCode(201, new { accessToken = token, userId = user.Id, userEmail = user.Email, message = "User registered" });
 
         }catch(Exception e){
             _logger.LogError(e.Message);

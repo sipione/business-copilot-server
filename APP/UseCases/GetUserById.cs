@@ -19,7 +19,7 @@ public class GetUserByIdUseCase{
         User userAuthenticated = await _authenticationService.Authenticate(requestUserId, token);
 
         if(userAuthenticated == null){
-            throw CommonExceptions.Unauthorized("Unauthorized: credentials are not invalid");
+            throw CommonExceptions.Unauthorized("Unauthorized: credentials are not valid");
         }
 
         if((userAuthenticated.Id == userId && !_userAuthorizationService.AuthorizeViewUsers(userAuthenticated, userId)) || (userAuthenticated.Id != userId && !_userAuthorizationService.AuthorizeViewUsers(userAuthenticated, null))){

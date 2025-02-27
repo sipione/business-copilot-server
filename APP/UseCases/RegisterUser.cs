@@ -16,7 +16,7 @@ public class RegisterUserUseCase{
         _cryptographyServices = cryptographyServices;
     }
 
-    public async Task<Guid> Execute(User newUser){
+    public async Task<User> Execute(User newUser){
         User userExists = await _userRepository.GetByEmail(newUser.Email);
         
         if (userExists != null){
@@ -27,6 +27,6 @@ public class RegisterUserUseCase{
 
         await _userRepository.Create(newUser);
 
-        return newUser.Id;
+        return newUser;
     }
 }

@@ -22,7 +22,7 @@ namespace APP.UseCases
 
             if(user == null)
             {
-                throw CommonExceptions.Unauthorized("Unauthorized: credentials are not invalid");
+                throw CommonExceptions.Unauthorized("Unauthorized: credentials are not valid");
             }
 
             if(!_userAuthorizationService.AuthorizeCreateStakeholders(user))

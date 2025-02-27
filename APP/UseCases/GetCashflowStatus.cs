@@ -20,7 +20,7 @@ public class GetCashflowStatusUseCase{
         User user = await _authenticationService.Authenticate(userId, token);
 
         if(user == null){
-            throw CommonExceptions.Unauthorized("Unauthorized: credentials are not invalid");
+            throw CommonExceptions.Unauthorized("Unauthorized: credentials are not valid");
         }
 
         if(!_userAuthorizationService.AuthorizeViewCashFlows(user)){
