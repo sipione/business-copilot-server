@@ -10,9 +10,9 @@ public class ContractRepository : IContractRepository
     {
         _context = context;
     }
-    public async Task<IEnumerable<Contract>> GetAll()
+    public async Task<IEnumerable<Contract>> GetAll(Guid ownerId)
     {
-        return await _context.Contracts.ToListAsync();
+        return await _context.Contracts.Where(contract => contract.UserId == ownerId).ToListAsync();
     }
     public async Task<Contract> GetById(Guid id)
     {

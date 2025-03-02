@@ -2,7 +2,7 @@ using APP.Entities;
 namespace APP.Interfaces.Repository;
 public interface IContractRepository
 {
-    Task<IEnumerable<Contract>> GetAll();
+    Task<IEnumerable<Contract>> GetAll(Guid ownerId);
     Task<Contract> GetById(Guid id);
     Task<IEnumerable<Contract>> GetByStakeholder(Guid stakeholderId);
     Task<IEnumerable<Contract>> GetByUser(Guid userId);

@@ -79,7 +79,7 @@ builder.Services.AddScoped<GetExpensesCategoriesUseCase>();
 builder.Services.AddScoped<GetCashflowStatusUseCase>();
 
 //Usecases to Contract
-// builder.Services.AddScoped<GetAllContractsUseCase>();
+builder.Services.AddScoped<GetAllContractsUseCase>();
 // builder.Services.AddScoped<GetContractByIdUseCase>();
 // builder.Services.AddScoped<CreateContractUseCase>();
 // builder.Services.AddScoped<UpdateContractUseCase>();

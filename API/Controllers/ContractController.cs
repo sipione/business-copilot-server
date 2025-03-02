@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using APP.Interfaces.Repository;
 using APP.Entities;
+using APP.UseCases;
+using APP.Exceptions;
 namespace API.Controllers;
 
 [ApiController]
@@ -9,21 +11,26 @@ namespace API.Controllers;
 public class ContractController : ControllerBase{
     private readonly ILogger<ContractController> _logger;
     private readonly IContractRepository _contractRepository;
+    private readonly GetAllContractsUseCase _getAllContractsUsecase;
 
-    public ContractController(ILogger<ContractController> logger, IContractRepository contractRepository)
+    public ContractController(ILogger<ContractController> logger, IContractRepository contractRepository, GetAllContractsUseCase getAllContractsUseCase)
     {
         _logger = logger;
         _contractRepository = contractRepository;
+        this._getAllContractsUsecase = getAllContractsUseCase;
     }
 
     [HttpGet(Name = "GetContracts")]
-    public async Task<IActionResult> Get()
-    {
+    public async Task<IActionResult> Get([FromHeader] Guid userId, [FromHeader] string token){
         try{
-            var contracts = await _contractRepository.GetAll();
-            return Ok(contracts);
+            IEnumerable<Contract>? result = await _getAllContractsUsecase.Execute(userId, token);
+            return Ok(result);
+            
         }catch(Exception ex){
-            _logger.LogError(ex, ex.Message);
+            if(ex is CommonExceptions commonException){
+                return StatusCode(commonException.StatusCode, commonException.Message);
+            }
+
             return StatusCode(500, "Internal Server Error");
         }
     }
