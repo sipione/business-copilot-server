@@ -12,20 +12,22 @@ public class ContractController : ControllerBase{
     private readonly ILogger<ContractController> _logger;
     private readonly IContractRepository _contractRepository;
     private readonly GetAllContractsUseCase _getAllContractsUsecase;
+    private readonly CreateContractUseCase _createContractUseCase;
 
-    public ContractController(ILogger<ContractController> logger, IContractRepository contractRepository, GetAllContractsUseCase getAllContractsUseCase)
+    public ContractController(ILogger<ContractController> logger, IContractRepository contractRepository, GetAllContractsUseCase getAllContractsUseCase, CreateContractUseCase createContractUseCase)
     {
         _logger = logger;
         _contractRepository = contractRepository;
         this._getAllContractsUsecase = getAllContractsUseCase;
+        this._createContractUseCase = createContractUseCase;
     }
 
     [HttpGet(Name = "GetContracts")]
     public async Task<IActionResult> Get([FromHeader] Guid userId, [FromHeader] string token){
         try{
             IEnumerable<Contract>? result = await _getAllContractsUsecase.Execute(userId, token);
+            // IEnumerable<Contract>? result = await _getAllContractsUsecase.ExecuteTest(userId);
             return Ok(result);
-            
         }catch(Exception ex){
             if(ex is CommonExceptions commonException){
                 return StatusCode(commonException.StatusCode, commonException.Message);
@@ -50,14 +52,13 @@ public class ContractController : ControllerBase{
     }
 
     [HttpPost(Name = "CreateContract")]
-    public async Task<IActionResult> Create(CreateContractDto createContractDto)
-    {
+    public async Task<IActionResult> Create([FromForm] CreateContractDto createContractDto){
         try{
-            var contract = new Contract(
+            var newContract = new Contract(
                 createContractDto.UserId,
                 createContractDto.StakeholderId,
                 createContractDto.Title,
-                createContractDto.Description,
+                createContractDto.Description ?? string.Empty,
                 createContractDto.InitialAmount,
                 createContractDto.Discount,
                 createContractDto.Installments,
@@ -66,16 +67,22 @@ public class ContractController : ControllerBase{
                 createContractDto.TotalAmount,
                 createContractDto.PaidAmount,
                 createContractDto.RemainingAmount,
-                createContractDto.DocumentPath,
+                createContractDto.DocumentPath ?? string.Empty,
                 createContractDto.VoucherId,
                 createContractDto.PaymentStatus,
                 createContractDto.ContractStatus,
                 createContractDto.StartDate,
                 createContractDto.EndDate
             );
-            var createdContract = await _contractRepository.Create(contract);
+
+            Contract createdContract = await _createContractUseCase.Execute(newContract);
             return CreatedAtRoute("GetContract", new { id = createdContract.Id }, createdContract);
+
         }catch(Exception ex){
+            if(ex is CommonExceptions ce){
+                return StatusCode(ce.StatusCode, ce.Message);
+            }
+
             _logger.LogError(ex, ex.Message);
             return StatusCode(500, "Internal Server Error");
         }

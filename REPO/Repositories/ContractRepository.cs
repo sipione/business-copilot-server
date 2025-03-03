@@ -2,6 +2,7 @@ using APP.Entities;
 using APP.Interfaces.Repository;
 using REPO.Data;
 using Microsoft.EntityFrameworkCore;
+using APP.Enums;
 
 public class ContractRepository : IContractRepository
 {

@@ -1,4 +1,5 @@
 using APP.Entities;
+using APP.Enums;
 namespace APP.Interfaces.Repository;
 public interface IContractRepository
 {

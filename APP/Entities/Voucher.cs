@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using APP.Enums;
 
 namespace APP.Entities;
 public class Voucher

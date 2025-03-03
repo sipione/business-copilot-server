@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using APP.Interfaces.Repository;
 using APP.Entities;
+using APP.Enums;
 namespace API.Controllers;
 
 [ApiController]

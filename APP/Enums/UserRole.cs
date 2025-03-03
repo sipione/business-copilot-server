@@ -1,3 +1,4 @@
+namespace APP.Enums;
 public enum UserRole
 {
     ADMIN,

@@ -35,4 +35,13 @@ public class GetAllContractsUseCase{
 
         return contracts;
     }
+    public async Task<IEnumerable<Contract>> ExecuteTest(Guid userId){
+
+        IEnumerable<Contract>? contracts = await _contractRepository.GetAll(userId);
+        if(contracts == null || contracts.Count() < 1){
+            throw CommonExceptions.NotFound("NOT FOUND: Was not possible to find any contact");
+        }
+
+        return contracts;
+    }
 }

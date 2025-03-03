@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using APP.Enums;
 using Microsoft.VisualBasic;
 
 namespace APP.Entities;

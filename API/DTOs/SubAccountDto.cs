@@ -1,3 +1,5 @@
+using APP.Enums;
+
 public class CreateSubAccountDto
 {
     public Guid UserId { get; set; }

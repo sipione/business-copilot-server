@@ -3,6 +3,7 @@ using APP.Interfaces.Services;
 using APP.Entities;
 using APP.Exceptions;
 using APP.UseCases;
+using APP.Enums;
 
 namespace API.Controllers;
 

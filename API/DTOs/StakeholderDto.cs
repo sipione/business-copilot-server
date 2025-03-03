@@ -1,3 +1,5 @@
+using APP.Enums;
+
 public class CreateStakeholderDto
 {
     public string Name { get; set; }
