@@ -28,6 +28,6 @@ public interface IUserAuthorizationService{
     bool AuthorizeDeleteProgresses(User user);
     bool AuthorizeViewContracts(User user);
     bool AuthorizeCreateContracts(User user);
-    bool AuthorizeUpdateContracts(User user);
+    bool AuthorizeUpdateContracts(User user, Guid contractOwner);
     bool AuthorizeDeleteContracts(User user);
 }

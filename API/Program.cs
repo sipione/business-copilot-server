@@ -82,7 +82,7 @@ builder.Services.AddScoped<GetCashflowStatusUseCase>();
 builder.Services.AddScoped<GetAllContractsUseCase>();
 // builder.Services.AddScoped<GetContractByIdUseCase>();
 builder.Services.AddScoped<CreateContractUseCase>();
-// builder.Services.AddScoped<UpdateContractUseCase>();
+builder.Services.AddScoped<UpdateContractUseCase>();
 // builder.Services.AddScoped<DeleteContractUseCase>();
 
 // //Usecases to Progress

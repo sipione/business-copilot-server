@@ -13,11 +13,12 @@ public class ContractRepository : IContractRepository
     }
     public async Task<IEnumerable<Contract>> GetAll(Guid ownerId)
     {
-        return await _context.Contracts.Where(contract => contract.UserId == ownerId).ToListAsync();
+        return await _context.Contracts.AsNoTracking().Where(contract => contract.UserId == ownerId).ToListAsync();
     }
-    public async Task<Contract> GetById(Guid id)
-    {
-        return await _context.Contracts.FindAsync(id);
+    public async Task<Contract?> GetById(Guid id){
+        Contract? result = await _context.Contracts.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
+
+        return result;
     }
     public async Task<IEnumerable<Contract>> GetByStakeholder(Guid stakeholderId)
     {

@@ -86,9 +86,17 @@ public class UserAuthorizationService : IUserAuthorizationService{
         return user.UserPermitionsList.Contains(permition);
     }
 
-    public bool AuthorizeUpdateContracts(User user){
-        Permitions permition = Permitions.UPDATE_CONTRACTS;
-        return user.UserPermitionsList.Contains(permition);
+    public bool AuthorizeUpdateContracts(User user, Guid contractOwner){
+
+        if(user.Role == UserRole.ADMIN){
+            return true;
+        }
+
+        if(user.UserPermitionsList.Contains(Permitions.UPDATE_CONTRACTS) && user.Id == contractOwner){
+            return true;
+        }
+
+        return false;
     }
 
     public bool AuthorizeDeleteContracts(User user){

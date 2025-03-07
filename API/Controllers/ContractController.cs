@@ -13,13 +13,15 @@ public class ContractController : ControllerBase{
     private readonly IContractRepository _contractRepository;
     private readonly GetAllContractsUseCase _getAllContractsUsecase;
     private readonly CreateContractUseCase _createContractUseCase;
+    private readonly UpdateContractUseCase _updateContractUseCase;
 
-    public ContractController(ILogger<ContractController> logger, IContractRepository contractRepository, GetAllContractsUseCase getAllContractsUseCase, CreateContractUseCase createContractUseCase)
+    public ContractController(ILogger<ContractController> logger, IContractRepository contractRepository, GetAllContractsUseCase getAllContractsUseCase, CreateContractUseCase createContractUseCase, UpdateContractUseCase updateContractUseCase)
     {
         _logger = logger;
         _contractRepository = contractRepository;
         this._getAllContractsUsecase = getAllContractsUseCase;
         this._createContractUseCase = createContractUseCase;
+        this._updateContractUseCase = updateContractUseCase;
     }
 
     [HttpGet(Name = "GetContracts")]
@@ -76,8 +78,8 @@ public class ContractController : ControllerBase{
             );
 
             Contract createdContract = await _createContractUseCase.Execute(newContract);
-            return CreatedAtRoute("GetContract", new { id = createdContract.Id }, createdContract);
 
+            return Ok(createdContract);
         }catch(Exception ex){
             if(ex is CommonExceptions ce){
                 return StatusCode(ce.StatusCode, ce.Message);
@@ -89,33 +91,40 @@ public class ContractController : ControllerBase{
     }
 
     [HttpPut(Name = "UpdateContract")]
-    public async Task<IActionResult> Update(UpdateContractDto updateContractDto)
-    {
-        try{
-            var contract = await _contractRepository.GetById(updateContractDto.Id);
-            if(contract == null){
-                return NotFound();
-            }
-            contract.StakeholderId = updateContractDto.StakeholderId ?? contract.StakeholderId;
-            contract.Title = updateContractDto.Title ?? contract.Title;
-            contract.Description = updateContractDto.Description ?? contract.Description;
-            contract.InitialAmount = updateContractDto.InitialAmount ?? contract.InitialAmount;
-            contract.Discount = updateContractDto.Discount ?? contract.Discount;
-            contract.Installments = updateContractDto.Installments ?? contract.Installments;
-            contract.Interest = updateContractDto.Interest ?? contract.Interest;
-            contract.Penalty = updateContractDto.Penalty ?? contract.Penalty;
-            contract.TotalAmount = updateContractDto.TotalAmount ?? contract.TotalAmount;
-            contract.PaidAmount = updateContractDto.PaidAmount ?? contract.PaidAmount;
-            contract.RemainingAmount = updateContractDto.RemainingAmount ?? contract.RemainingAmount;
-            contract.DocumentPath = updateContractDto.DocumentPath ?? contract.DocumentPath;
-            contract.VoucherId = updateContractDto.VoucherId ?? contract.VoucherId;
-            contract.PaymentStatus = updateContractDto.PaymentStatus ?? contract.PaymentStatus;
-            contract.ContractStatus = updateContractDto.ContractStatus ?? contract.ContractStatus;
-            contract.StartDate = updateContractDto.StartDate ?? contract.StartDate;
-            contract.EndDate = updateContractDto.EndDate ?? contract.EndDate;
-            var updatedContract = await _contractRepository.Update(contract);
-            return Ok(updatedContract);
+    public async Task<IActionResult> Update([FromHeader]Guid userId, [FromHeader]string token, [FromForm] UpdateContractDto updateContractDto){
+        try{     
+            Contract newContract = new()
+            {
+                Id = updateContractDto.Id,
+                UserId = updateContractDto.UserId,
+                StakeholderId = updateContractDto.StakeholderId,
+                Title = updateContractDto.Title ?? string.Empty,
+                Description = updateContractDto.Description,
+                InitialAmount = updateContractDto.InitialAmount,
+                Discount = updateContractDto.Discount,
+                Installments = updateContractDto.Installments,
+                Interest = updateContractDto.Interest,
+                Penalty = updateContractDto.Penalty,
+                TotalAmount = updateContractDto.TotalAmount,
+                PaidAmount = updateContractDto.PaidAmount,
+                RemainingAmount = updateContractDto.RemainingAmount,
+                DocumentPath = updateContractDto.DocumentPath,
+                VoucherId = updateContractDto.VoucherId,
+                PaymentStatus = updateContractDto.PaymentStatus,
+                ContractStatus = updateContractDto.ContractStatus,
+                StartDate = updateContractDto.StartDate,
+                EndDate = updateContractDto.EndDate
+            };
+            
+            Contract? result = await this._updateContractUseCase.Execute(userId, newContract, token);
+
+            return Ok(result);
+            
         }catch(Exception ex){
+            if(ex is CommonExceptions ce){
+                return StatusCode(ce.StatusCode, ce.Message);
+            }
+
             _logger.LogError(ex, ex.Message);
             return StatusCode(500, "Internal Server Error");
         }

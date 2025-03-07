@@ -20,17 +20,17 @@ public class GetAllContractsUseCase{
         User? user = await _authenticationService.Authenticate(userId, token);
 
         if(user == null){
-            throw CommonExceptions.Unauthorized("Unauthorized: credentials are not valid to see the contacts");
+            throw CommonExceptions.Unauthorized("Unauthorized: credentials are not valid to see the contracts");
         }
 
         bool isAuthorized = _userAuthorizationService.AuthorizeViewContracts(user);
         if(!isAuthorized){
-            throw CommonExceptions.Forbidden("Forbidden: the user cannot see the contacts");
+            throw CommonExceptions.Forbidden("Forbidden: the user cannot see the contracts");
         }
 
         IEnumerable<Contract>? contracts = await _contractRepository.GetAll(user.Id);
         if(contracts == null || contracts.Count() < 1){
-            throw CommonExceptions.NotFound("NOT FOUND: Was not possible to find any contact");
+            throw CommonExceptions.NotFound("NOT FOUND: Was not possible to find any contract");
         }
 
         return contracts;
@@ -39,7 +39,7 @@ public class GetAllContractsUseCase{
 
         IEnumerable<Contract>? contracts = await _contractRepository.GetAll(userId);
         if(contracts == null || contracts.Count() < 1){
-            throw CommonExceptions.NotFound("NOT FOUND: Was not possible to find any contact");
+            throw CommonExceptions.NotFound("NOT FOUND: Was not possible to find any contract");
         }
 
         return contracts;
